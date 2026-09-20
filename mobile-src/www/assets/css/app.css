@@ -315,9 +315,16 @@ code.inline { font-family: var(--f-mono); font-size: .84em; background: var(--su
   backdrop-filter: blur(18px) saturate(140%);
   border-bottom: 1px solid var(--line);
 }
-.crumb { font-family: var(--f-display); font-weight: 750; font-size: .98rem; letter-spacing: -.01em; }
+.crumb { font-family: var(--f-display); font-weight: 750; font-size: .98rem; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar-actions { display: flex; gap: .35rem; margin-left: auto; }
-.topbar-title { min-width: 0; }
+.topbar-title { min-width: 0; overflow: hidden; }
+
+/* The brand lives in the sidebar on a wide screen, and in the top bar once the
+   sidebar becomes a drawer (narrow windows) or is hidden entirely (Android). */
+.topbar-brand { display: none; align-items: center; gap: .5rem; flex: 0 1 auto; min-width: 0; text-decoration: none !important; }
+.topbar-brand .brand-text { font-size: .95rem; white-space: nowrap; }
+.topbar-brand .logo-mark { height: 17px; flex: 0 0 auto; }
+.topbar-brand .logo-mark i { width: 3.5px; height: 17px; }
 
 .view-root {
   flex: 1; min-width: 0; outline: none;
@@ -589,10 +596,14 @@ ol.tick li::marker { color: var(--accent); font-weight: 700; }
 .chk-row label.done { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--line-2); }
 
 /* --------------------------------- modal --------------------------------- */
-.modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(4,8,12,.62); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; padding: 1.2rem; animation: fadeIn .2s var(--ease) both; }
+/* The overlay itself carries the safe-area insets, so a dialog can never sit
+   under the status bar or the Android navigation bar. Its height is capped to
+   the space that is actually left (100% of the padded box) rather than to the
+   whole viewport, or the footer would be pushed back under the nav bar. */
+.modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(4,8,12,.62); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; padding: calc(1.2rem + env(safe-area-inset-top, 0px)) 1.2rem calc(1.2rem + env(safe-area-inset-bottom, 0px)); animation: fadeIn .2s var(--ease) both; }
 .modal {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-pop);
-  width: 100%; max-width: 620px; max-height: 88vh; overflow-y: auto; padding: 1.4rem 1.45rem;
+  width: 100%; max-width: 620px; max-height: 100%; overflow-y: auto; padding: 1.4rem 1.45rem;
   animation: modalIn .34s var(--spring) both;
 }
 .modal.wide { max-width: 880px; }
@@ -892,6 +903,7 @@ ol.tick li::marker { color: var(--accent); font-weight: 700; }
   .sidebar.open { transform: none; }
   .only-mobile { display: inline-grid !important; }
   .only-desktop { display: none !important; }
+  .topbar-brand { display: flex; }
   .scrim { position: fixed; inset: 0; z-index: 99; background: rgba(4,8,12,.55); backdrop-filter: blur(3px); animation: fadeIn .2s var(--ease) both; }
   .view-root { padding: 1.2rem 1rem 6.6rem; }
   /* All eight sections share the bar equally. Nothing scrolls sideways,
@@ -934,7 +946,7 @@ ol.tick li::marker { color: var(--accent); font-weight: 700; }
   .card { padding: .9rem .95rem; }
   .card.pad { padding: 1.05rem 1.05rem; }
   .hero { padding: 1.2rem 1.1rem; border-radius: var(--r-md); }
-  .modal { padding: 1.1rem 1rem; border-radius: var(--r-md); max-height: 92vh; }
+  .modal { padding: 1.1rem 1rem; border-radius: var(--r-md); max-height: 100%; }
   .ring { width: 98px; height: 98px; }
   .tile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field-row, .field-row.tight { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -989,6 +1001,8 @@ html.lite .dots { display: none; }
 /* ========================================================================== */
 html.android-app .sidebar { display: none !important; }
 html.android-app .only-mobile { display: none !important; }
+/* No drawer on Android, so the top bar is the only place the brand can live. */
+html.android-app .topbar-brand { display: flex; }
 
 /* A translucent bar over scrolling content reads as a rendering fault on a
    phone, and the blur costs real frame time on a mobile GPU. Solid instead. */
@@ -1016,5 +1030,6 @@ html.android-app.e2e .tabbar { padding-bottom: calc(.26rem + max(env(safe-area-i
 /* Keep page content and toasts clear of the taller bar. */
 html.e2e .view-root { padding-bottom: calc(7rem + max(env(safe-area-inset-bottom, 0px), 20px)); }
 html.e2e .toast-root { bottom: calc(80px + max(env(safe-area-inset-bottom, 0px), 20px)); }
-html.e2e .modal-back { padding-top: calc(1.2rem + max(env(safe-area-inset-top, 0px), 24px)); }
+html.e2e .modal-back { padding-top: calc(1.2rem + max(env(safe-area-inset-top, 0px), 24px)); padding-bottom: calc(1.2rem + max(env(safe-area-inset-bottom, 0px), 20px)); }
+html.android-app.e2e .modal-back { padding-bottom: calc(1.2rem + max(env(safe-area-inset-bottom, 0px), 20px)); }
 html.e2e .splash-inner { padding-bottom: calc(2rem + max(env(safe-area-inset-bottom, 0px), 20px)); }

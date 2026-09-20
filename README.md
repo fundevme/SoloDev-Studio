@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-# SoloDev Studio 2.3.0
-=======
-# SoloDev Studio 2.2.8
+# SoloDev Studio 2.3.1
 <img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
->>>>>>> a5cbbe7a07d974a2af22b42062819601b451b0f2
 
 **Plan your game. Design it. Check the market. Tell people about it.**
 
@@ -18,8 +14,8 @@ Available on Windows and Android
 
 | File | What it is |
 | --- | --- |
-| `SoloDevStudio-2.3.0-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevStudio-2.3.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevStudio-2.3.1-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevStudio-2.3.1.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
@@ -27,7 +23,7 @@ Available on Windows and Android
 
 ---
 
-## What is new in 2.3.0
+## What is new in 2.3.1
 
 **Campaigns are yours to shape.** Each phase now carries its own checklist, so
 you can build the marketing plan around your game instead of the other way
@@ -70,6 +66,26 @@ blank screen.
 **Technical limits: "Starter value" is now "Target value", and it is editable.**
 Set your own target on any row and the status column compares your numbers
 against it, not against a fixed example.
+
+**The logo is always on screen.** On a wide window the brand sits in the
+sidebar. Once the sidebar turns into a drawer (a narrow window) or is removed
+altogether (the Android app), the same mark and wordmark now appear in the top
+bar, so the app is always identifiable at a glance.
+
+**A new icon everywhere.** The old icon placed a small "S:D" badge inside a
+green square, so launchers showed it boxed in the middle of a circle. The icon
+is now the app's own three-bar mark — green, purple and orange — drawn
+full-bleed on a soft mint tile. It is used on the Windows `.exe` file itself,
+on the app window, on every Android launcher icon (adaptive, round and the
+older flat ones), and the Android splash screen now shows the same mark on the
+app's dark background.
+
+**Dialogs keep clear of the system bars.** On Android 15 and later the app
+draws edge to edge. The bottom of a dialog — such as **New game project** — was
+landing under the navigation bar, which put the confirm button somewhere
+awkward to reach. Dialogs now respect the status bar and the navigation bar,
+and their height is capped to the space that is actually left, so the actions
+always stay in reach.
 
 **Also fixed:** the page no longer redraws when you log hours from the Plan
 page, and the worked example project still fills in its starter design content

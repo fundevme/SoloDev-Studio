@@ -64,6 +64,13 @@
         <button class="icon-btn only-mobile" id="btn-menu" aria-label="Open menu">
           <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
+        <!-- The sidebar carries the brand when it is on screen. When it becomes
+             a drawer (narrow windows) or is removed altogether (the Android
+             app), the top bar carries it instead, so the logo is always visible. -->
+        <a class="topbar-brand" href="#/home" aria-label="SoloDev Studio — Home">
+          <span class="logo-mark"><i></i><i></i><i></i></span>
+          <span class="brand-text">SoloDev<b>Studio</b></span>
+        </a>
         <div class="topbar-title">
           <span class="crumb" id="crumb">Home</span>
         </div>

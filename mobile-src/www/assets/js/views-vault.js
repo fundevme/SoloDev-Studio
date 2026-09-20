@@ -328,7 +328,7 @@
         App.el('p', { class: 'card-body' }, App.frag(App.md('**SoloDev Studio** is a planning, design, market research and marketing companion for one person making games. It started as a strategy document and grew into a tool. Everything runs offline, nothing is uploaded, and there is no account.'))),
         App.el('p', { class: 'card-body' }, App.frag(App.md('The guides are condensed from the original studio documents and cross-checked against public reporting from September 2026. Every factual claim is listed in the Sources tab with where it came from. The calculators are planning models, not promises.'))),
         App.el('div', { class: 'grid g3', style: { marginTop: '.8rem' } },
-          miniStat('Version', '2.3.0'),
+          miniStat('Version', '2.3.1'),
           miniStat('Projects', String(App.Store.data.games.length)),
           miniStat('Running since', App.Store.data.meta.created || App.today())),
         App.el('div', { class: 'btn-row', style: { marginTop: '.8rem' } },
