@@ -68,43 +68,61 @@
   /* ------------------------------ today row ------------------------------ */
   function topRow(active) {
     var d = App.Store.data;
-    var week = App.hoursThisWeek();
-    var target = d.settings.weeklyHoursTarget || 30;
-    var ceiling = d.settings.workCeiling || 40;
-    var pct = ceiling ? week / ceiling : 0;
-    var days = App.lastNDays(14);
-    var values = days.map(App.hoursOn);
-    var todayIdx = days.length - 1;
 
-    var ringCard = App.el('div', { class: 'card pad' },
-      App.el('div', { class: 'row', style: { gap: '1.1rem', alignItems: 'center' } },
-        App.ring(pct, 'of ceiling', String(week) + 'h'),
-        App.el('div', { style: { flex: '1', minWidth: '150px' } },
-          App.el('div', { class: 'kicker' }, 'This week'),
-          App.el('h3', { class: 'card-t', style: { marginBottom: '.2rem' } },
-            week <= target ? 'On track' : week <= ceiling ? 'Slightly over target' : 'Over the ceiling'),
-          App.el('p', { class: 'card-s' },
-            'Target ' + target + ' h · ceiling ' + ceiling + ' h. ' +
-            (week > ceiling ? 'Stop. Long weeks cost more than they give.' : 'Long weeks cost more than they give.')),
-          App.el('div', { class: 'btn-row', style: { marginTop: '.6rem' } },
-            [1, 2, 4].map(function (n) {
-              return App.el('button', { class: 'btn sm', onclick: function () {
-                App.addHours(App.today(), n);
-                App.toast('+' + n + ' h logged for today.');
-                App.renderRoute();
-              } }, '+' + n + 'h');
-            }),
-            App.el('button', { class: 'btn sm ghost', onclick: function () {
-              App.addHours(App.today(), -1);
-              App.renderRoute();
-            } }, '−1h')
+    /* The card paints itself. Logging hours repaints just this card, so the
+       page is not torn down and rebuilt under the user on every tap. */
+    var ringHost = App.el('div', {});
+    function paint() {
+      var week = App.hoursThisWeek();
+      var target = d.settings.weeklyHoursTarget || 30;
+      var ceiling = d.settings.workCeiling || 40;
+      var pct = ceiling ? week / ceiling : 0;
+      var days = App.lastNDays(14);
+      var values = days.map(App.hoursOn);
+      var todayIdx = days.length - 1;
+
+      /* The ring recolours as the week fills up: accent while on track, amber
+         once past the target, red once past the ceiling. It reads at a glance
+         without having to compare the numbers. */
+      var ringA = week > ceiling ? 'var(--bad)' : week > target ? 'var(--warm)' : null;
+      var ringB = week > ceiling ? '#e11d48' : week > target ? '#f97316' : null;
+
+      App.clear(ringHost);
+      ringHost.append(
+        App.el('div', { class: 'row', style: { gap: '1.1rem', alignItems: 'center' } },
+          App.ring(pct, 'of ceiling', String(week) + 'h', ringA, ringB),
+          App.el('div', { style: { flex: '1', minWidth: '150px' } },
+            App.el('div', { class: 'kicker' }, 'This week'),
+            App.el('h3', { class: 'card-t', style: { marginBottom: '.2rem' } },
+              week <= target ? 'On track' : week <= ceiling ? 'Slightly over target' : 'Over the ceiling'),
+            App.el('p', { class: 'card-s' },
+              'Target ' + target + ' h · ceiling ' + ceiling + ' h. ' +
+              (week > ceiling ? 'Stop. Long weeks cost more than they give.' : 'Long weeks cost more than they give.')),
+            App.el('div', { class: 'btn-row', style: { marginTop: '.6rem' } },
+              [1, 2, 4].map(function (n) {
+                return App.el('button', { class: 'btn sm', onclick: function () {
+                  App.addHours(App.today(), n);
+                  App.toast('+' + n + ' h logged for today.');
+                  paint();
+                  App.renderSideMini();
+                } }, '+' + n + 'h');
+              }),
+              App.el('button', { class: 'btn sm ghost', onclick: function () {
+                App.addHours(App.today(), -1);
+                paint();
+                App.renderSideMini();
+              } }, '−1h')
+            )
           )
-        )
-      ),
-      App.el('div', { style: { marginTop: '.9rem' } },
-        App.bars(values, { labels: days.map(function (x) { return App.fmtDate(x, 'short'); }), todayIndex: todayIdx, over: 8, unit: 'h', height: 46 })),
-      App.el('div', { class: 'tiny muted', style: { marginTop: '.35rem' } }, 'Last 14 days. Orange is today, red means over 8 hours.')
-    );
+        ),
+        App.el('div', { style: { marginTop: '.9rem' } },
+          App.bars(values, { labels: days.map(function (x) { return App.fmtDate(x, 'short'); }), todayIndex: todayIdx, over: 8, unit: 'h', height: 46 })),
+        App.el('div', { class: 'tiny muted', style: { marginTop: '.35rem' } }, 'Last 14 days. Orange is today, red means over 8 hours.')
+      );
+    }
+    paint();
+
+    var ringCard = App.el('div', { class: 'card pad' }, ringHost);
 
     var streakCard = App.el('div', { class: 'card pad' },
       App.el('div', { class: 'kicker' }, 'Worked on'),

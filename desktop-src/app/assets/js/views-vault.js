@@ -328,7 +328,7 @@
         App.el('p', { class: 'card-body' }, App.frag(App.md('**SoloDev Studio** is a planning, design, market research and marketing companion for one person making games. It started as a strategy document and grew into a tool. Everything runs offline, nothing is uploaded, and there is no account.'))),
         App.el('p', { class: 'card-body' }, App.frag(App.md('The guides are condensed from the original studio documents and cross-checked against public reporting from September 2026. Every factual claim is listed in the Sources tab with where it came from. The calculators are planning models, not promises.'))),
         App.el('div', { class: 'grid g3', style: { marginTop: '.8rem' } },
-          miniStat('Version', '2.0'),
+          miniStat('Version', '2.3.0'),
           miniStat('Projects', String(App.Store.data.games.length)),
           miniStat('Running since', App.Store.data.meta.created || App.today())),
         App.el('div', { class: 'btn-row', style: { marginTop: '.8rem' } },
@@ -422,6 +422,13 @@
       return;
     }
     var g = App.newGame({ title: 'Aether Strike', codename: 'Project Comet', label: 'A', msrp: 6.99, targetWeeks: 14, targetRelease: nextMonth(5) });
+    /* A new project now starts blank; the worked example fills in the starter
+       design content on purpose. */
+    var tpl = App.data.gddTemplates.A;
+    g.gdd.pillars = tpl.pillars.map(function (p) { return { t: p.t, d: p.d }; });
+    g.gdd.loops = Object.assign({}, tpl.loops);
+    g.gdd.art.palette = ['#0f766e', '#f5f5f4', '#171c22', '#f59e0b', '#8b7cf6'];
+    g.gdd.tech = Object.assign({}, tpl.tech);
     g.stage = 4;
     g.status = App.stageStatus(4);
     g.active = !d.games.some(function (x) { return x.active; });
@@ -491,11 +498,11 @@
       return { date: day, count: Math.round(180 + i * i * 34 + i * 90) };
     });
     g.marketing.campaigns = App.data.campaignTemplate.map(function (c, i) {
-      return { id: App.uid('c'), phase: c.phase, when: c.when, goal: c.goal, done: i === 0, open: i <= 1 };
-    });
-    g.marketing.tasks = {};
-    App.data.campaignTemplate.forEach(function (c, i) {
-      g.marketing.tasks[c.phase] = c.tasks.map(function (_, ti) { return i === 0 && ti < 3; });
+      return {
+        id: App.uid('c'), phase: c.phase, when: c.when, goal: c.goal,
+        done: i === 0, open: i <= 1,
+        tasks: c.tasks.map(function (t, ti) { return { text: t, done: i === 0 && ti < 3 }; })
+      };
     });
     g.marketing.content = [
       { id: App.uid('p'), date: App.addDays(App.today(), -6), type: 'Clip', title: 'Deflect chain into a teleport strike', channel: 'Shorts', done: true },

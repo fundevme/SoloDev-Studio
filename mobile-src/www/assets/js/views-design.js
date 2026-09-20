@@ -696,22 +696,48 @@
       ['vramMB', 'Texture memory (MB)', 'How much video memory the textures can use'],
       ['fps', 'Target frame rate', 'What you are aiming for on the hardware you support']
     ];
+
+    /* Targets start from the starter figures but are yours to change. */
+    gd.techTargets = gd.techTargets || {};
+    rows.forEach(function (r) { if (gd.techTargets[r[0]] == null) gd.techTargets[r[0]] = tpl[r[0]]; });
+
     panel.append(App.el('div', { class: 'field-row' }, rows.map(function (r) {
-      var inp = App.el('input', { type: 'number', value: gd.tech[r[0]] });
+      var inp = App.el('input', { type: 'number', value: gd.tech[r[0]] == null ? '' : gd.tech[r[0]] });
       inp.addEventListener('change', function () { gd.tech[r[0]] = Number(inp.value) || 0; App.Store.save(); App.renderRoute(); });
       return App.field(r[1], inp, r[2]);
     })));
 
+    var statusCell = {};
+    function paint() {
+      rows.forEach(function (r) {
+        var cell = statusCell[r[0]];
+        if (!cell) return;
+        App.clear(cell);
+        var over = Number(gd.tech[r[0]] || 0) > Number(gd.techTargets[r[0]] || 0);
+        cell.append(over ? App.el('span', { class: 'badge warn' }, 'above target') : App.el('span', { class: 'badge good' }, 'within'));
+      });
+    }
+
+    var tbody = App.el('tbody', {}, rows.map(function (r) {
+      var targetInp = App.el('input', { type: 'number', value: gd.techTargets[r[0]] == null ? '' : gd.techTargets[r[0]], style: { width: '92px' } });
+      targetInp.addEventListener('change', function () {
+        gd.techTargets[r[0]] = Number(targetInp.value) || 0;
+        App.Store.save();
+        paint();
+      });
+      var cell = App.el('td', {});
+      statusCell[r[0]] = cell;
+      return App.el('tr', {},
+        App.el('td', {}, r[1]),
+        App.el('td', { class: 'num' }, App.num(Number(gd.tech[r[0]] || 0))),
+        App.el('td', { class: 'num' }, targetInp),
+        cell);
+    }));
+    paint();
+
     var tbl = App.el('div', { class: 'tbl-wrap' }, App.el('table', { class: 'tbl' },
-      App.el('thead', {}, App.el('tr', {}, App.el('th', {}, 'Budget'), App.el('th', {}, 'Yours'), App.el('th', {}, 'Starter value'), App.el('th', {}, 'Status'))),
-      App.el('tbody', {}, rows.map(function (r) {
-        var over = gd.tech[r[0]] > tpl[r[0]];
-        return App.el('tr', {},
-          App.el('td', {}, r[1]),
-          App.el('td', { class: 'num' }, App.num(gd.tech[r[0]])),
-          App.el('td', { class: 'num muted' }, App.num(tpl[r[0]])),
-          App.el('td', {}, over ? App.el('span', { class: 'badge warn' }, 'above the starter') : App.el('span', { class: 'badge good' }, 'within')));
-      }))));
+      App.el('thead', {}, App.el('tr', {}, App.el('th', {}, 'Budget'), App.el('th', {}, 'Yours'), App.el('th', {}, 'Target value'), App.el('th', {}, 'Status'))),
+      tbody));
     panel.append(tbl,
       App.el('div', { class: 'callout warn' },
         App.el('div', { class: 'ct' }, 'The test that matters'),
@@ -855,7 +881,7 @@
       if (current === 'world') { gd.world = { rules: '', factions: '', notes: '' }; gd.characters = []; }
       if (current === 'art') gd.art = { palette: [], notes: '', shader: '' };
       if (current === 'mood') g.mood = { tiles: [] };
-      if (current === 'tech') gd.tech = Object.assign({}, App.data.gddTemplates[g.label].tech);
+      if (current === 'tech') gd.tech = {};
       if (current === 'balance') gd.balance = { economy: '', difficulty: '', tuning: '' };
       if (current === 'plan') gd.plan = { milestones: [], risks: '' };
       if (current === 'playtest') gd.playtest = [];

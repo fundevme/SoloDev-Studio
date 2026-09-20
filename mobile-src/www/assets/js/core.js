@@ -314,6 +314,7 @@
     g.marketing.budget = g.marketing.budget || [];
     g.marketing.copy = g.marketing.copy || { short: '', long: '', features: '', tags: '' };
     g.marketing.channels = g.marketing.channels || [];
+    normalizeMarketing(g);
     g.gdd = g.gdd || {};
     g.gdd.concept = g.gdd.concept || { pitch: '', genre: '', audience: '', hook: '', usp: '' };
     g.gdd.pillars = g.gdd.pillars && g.gdd.pillars.length ? g.gdd.pillars : [{ t: '', d: '' }, { t: '', d: '' }, { t: '', d: '' }];
@@ -323,6 +324,7 @@
     g.gdd.characters = g.gdd.characters || [];
     g.gdd.art = g.gdd.art || { palette: [], notes: '', shader: '' };
     g.gdd.tech = g.gdd.tech || {};
+    g.gdd.techTargets = g.gdd.techTargets || {};
     g.gdd.plan = g.gdd.plan || { milestones: [], risks: '' };
     g.gdd.feel = g.gdd.feel || { camera: '', feedback: '', controls: '', audio: '' };
     g.gdd.balance = g.gdd.balance || { economy: '', difficulty: '', tuning: '' };
@@ -331,6 +333,27 @@
     return g;
   }
   App.upgradeGame = upgradeGame;
+
+  /* Campaign phases used to borrow their checklist text from App.data and only
+     store a parallel array of tick states, keyed by the phase name. That fell
+     apart the moment a phase was renamed or given its own items, so each phase
+     now carries its own { text, done } checklist. Older data is converted here,
+     once, on the way in. */
+  function normalizeMarketing(g) {
+    var m = (g.marketing = g.marketing || {});
+    m.campaigns = m.campaigns || [];
+    var legacy = m.tasks || {};
+    m.campaigns.forEach(function (c) {
+      if (Array.isArray(c.tasks)) return;
+      var tpl = ((App.data && App.data.campaignTemplate) || []).filter(function (x) { return x.phase === c.phase; })[0];
+      var state = legacy[c.phase] || [];
+      var src = tpl ? tpl.tasks : [];
+      c.tasks = src.map(function (t, i) { return { text: t, done: !!state[i] }; });
+    });
+    delete m.tasks;
+    return m;
+  }
+  App.normalizeMarketing = normalizeMarketing;
 
   /* ======================================================================== */
   /* IMAGE STORE                                                              */
@@ -547,7 +570,6 @@
   App.newGame = function (fields) {
     var f = fields || {};
     var label = f.label || 'A';
-    var tpl = (App.data && App.data.gddTemplates && App.data.gddTemplates[label]) || {};
     var g = {
       id: App.uid('g'),
       title: f.title || 'Untitled game',
@@ -573,8 +595,13 @@
         ledger: [],
         world: { rules: '', factions: '', notes: '' },
         characters: [],
-        art: { palette: ['#0f766e', '#f5f5f4', '#171c22', '#f59e0b', '#8b7cf6'], notes: '', shader: '' },
-        tech: Object.assign({ trisHero: 9500, trisEnemy: 1800, drawCalls: 110, vramMB: 1200, fps: 60 }, (tpl.tech || {})),
+        /* A fresh project starts genuinely empty. The starter palettes, budgets
+           and checklists live in App.data and are offered as buttons on each
+           section, so the design document opens at 0 of 13 filled in instead of
+           counting borrowed values as work you have done. */
+        art: { palette: [], notes: '', shader: '' },
+        tech: {},
+        techTargets: {},
         plan: { milestones: [], risks: '' },
         feel: { camera: '', feedback: '', controls: '', audio: '' },
         balance: { economy: '', difficulty: '', tuning: '' },
@@ -585,8 +612,6 @@
       market: { tags: [], notes: '', audience: '', hooks: [], wishlists: [] },
       marketing: { campaigns: [], content: [], press: [], budget: [], channels: [], copy: { short: '', long: '', features: '', tags: '' } }
     };
-    if (tpl.pillars) g.gdd.pillars = tpl.pillars.map(function (p) { return { t: p.t, d: p.d }; });
-    if (tpl.loops) g.gdd.loops = Object.assign({}, tpl.loops);
     return g;
   };
 
@@ -1029,7 +1054,7 @@
   /* CHART HELPERS                                                            */
   /* ======================================================================== */
 
-  App.ring = function (pct, label, value, color) {
+  App.ring = function (pct, label, value, color, color2) {
     var r = 46, c = 2 * Math.PI * r;
     var len = c;
     var off = c * (1 - App.clamp(pct, 0, 1));
@@ -1038,15 +1063,22 @@
     var svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox', '0 0 116 116');
     var defs = document.createElementNS(ns, 'defs');
+    /* stop-color is set through style so the theme variables resolve reliably
+       (var() is not dependable inside SVG presentation attributes). */
     defs.innerHTML = '<linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" stop-color="' + (color || 'var(--accent)') + '"/>' +
-      '<stop offset="100%" stop-color="var(--secondary)"/></linearGradient>';
+      '<stop offset="0%" style="stop-color:' + (color || 'var(--accent)') + '"/>' +
+      '<stop offset="100%" style="stop-color:' + (color2 || 'var(--secondary)') + '"/></linearGradient>';
     svg.appendChild(defs);
     var track = document.createElementNS(ns, 'circle');
     track.setAttribute('class', 'track'); track.setAttribute('cx', '58'); track.setAttribute('cy', '58'); track.setAttribute('r', String(r)); track.setAttribute('stroke-width', '9');
     var val = document.createElementNS(ns, 'circle');
     val.setAttribute('class', 'val'); val.setAttribute('cx', '58'); val.setAttribute('cy', '58'); val.setAttribute('r', String(r)); val.setAttribute('stroke-width', '9');
-    val.setAttribute('stroke', 'url(#' + gid + ')');
+    /* Each ring builds its own gradient with a unique id, so the reference has
+       to be set inline. A presentation attribute would be overridden by any
+       stylesheet rule for .val (the browser cannot know the id), which left the
+       progress arc pointing at a gradient that did not exist — so the ring sat
+       grey and never changed as hours were added. */
+    val.style.stroke = 'url(#' + gid + ')';
     val.style.setProperty('--len', len);
     val.style.setProperty('--off', off);
     svg.appendChild(track); svg.appendChild(val);

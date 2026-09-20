@@ -156,6 +156,15 @@ body::before {
 }
 img { max-width: 100%; display: block; }
 button { font: inherit; color: inherit; }
+/* On Android, tapping any element flashes the WebView's default blue box over
+   it. The app already draws its own pressed states, so that highlight is turned
+   off everywhere, and controls do not need text selection. */
+*, *::before, *::after { -webkit-tap-highlight-color: transparent; }
+button, .btn, .chip, .tab-item, .nav-item, .icon-btn, .link-btn, .seg button, .tabs button { -webkit-user-select: none; user-select: none; }
+/* Author display rules (e.g. .stack { display:flex }) outrank the user-agent
+   rule for [hidden], so anything toggled with el.hidden needs this to actually
+   disappear. */
+[hidden] { display: none !important; }
 a { color: var(--accent-2); text-decoration: none; }
 [data-theme="dark"] a { color: var(--accent); }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -442,7 +451,8 @@ code.inline { font-family: var(--f-mono); font-size: .84em; background: var(--su
 .ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
 .ring circle { fill: none; stroke-linecap: round; }
 .ring .track { stroke: var(--surface-3); }
-.ring .val { stroke: url(#ringGrad); stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: ringFill 1.1s var(--ease-out) .1s forwards; }
+/* The stroke itself is set inline per ring, each with its own gradient id. */
+.ring .val { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: ringFill 1.1s var(--ease-out) .1s forwards; }
 @keyframes ringFill { to { stroke-dashoffset: var(--off); } }
 .ring .ring-mid { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
 .ring .ring-v { font-family: var(--f-display); font-weight: 800; font-size: 1.45rem; letter-spacing: -.03em; line-height: 1; }

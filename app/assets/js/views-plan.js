@@ -37,37 +37,49 @@
   /* ============================ WEEK BAR ================================= */
   function renderWeek() {
     var d = App.Store.data;
-    var week = App.hoursThisWeek();
-    var ceiling = d.settings.workCeiling || 40;
-    var target = d.settings.weeklyHoursTarget || 30;
-    var days = App.lastNDays(14);
-    var values = days.map(App.hoursOn);
-    var maxH = Math.max.apply(null, values.concat([1]));
+    var host = App.el('div', { class: 'card pad', style: { marginBottom: '1.2rem' } });
 
-    return App.el('div', { class: 'card pad', style: { marginBottom: '1.2rem' } },
-      App.el('div', { class: 'row between' },
-        App.el('div', {},
-          App.el('div', { class: 'kicker' }, 'This week'),
-          App.el('div', { class: 'row', style: { alignItems: 'baseline', gap: '.5rem' } },
-            App.el('span', { class: 'num-lg' }, week + ' h'),
-            App.el('span', { class: 'tiny muted' }, 'of ' + ceiling + ' h ceiling · target ' + target + ' h'))),
-        App.el('div', { class: 'btn-row' },
-          [1, 2, 4].map(function (n) {
-            return App.el('button', { class: 'btn sm', onclick: function () {
-              App.addHours(App.today(), n);
-              App.renderRoute();
-            } }, '+' + n + 'h');
-          }),
-          App.el('button', { class: 'btn sm ghost', onclick: function () {
-            App.addHours(App.today(), -1); App.renderRoute();
-          } }, '−1h')
-        )
-      ),
-      App.el('div', { class: 'meter ' + (week > ceiling ? 'bad' : week > target ? 'warn' : ''), style: { margin: '.7rem 0' } },
-        App.el('i', { style: { width: Math.min(100, (week / ceiling) * 100) + '%' } })),
-      App.bars(values, { labels: days.map(function (x) { return App.fmtDate(x, 'short'); }), todayIndex: 13, over: 8, unit: 'h', height: 44, min: maxH }),
-      App.el('div', { class: 'tiny muted', style: { marginTop: '.3rem' } }, 'Last 14 days · orange = today · red = over 8 hours')
-    );
+    /* Repaint only this card when hours are logged, so tapping +1h does not
+       rebuild the whole page. */
+    function paint() {
+      var week = App.hoursThisWeek();
+      var ceiling = d.settings.workCeiling || 40;
+      var target = d.settings.weeklyHoursTarget || 30;
+      var days = App.lastNDays(14);
+      var values = days.map(App.hoursOn);
+      var maxH = Math.max.apply(null, values.concat([1]));
+
+      App.clear(host);
+      host.append(
+        App.el('div', { class: 'row between' },
+          App.el('div', {},
+            App.el('div', { class: 'kicker' }, 'This week'),
+            App.el('div', { class: 'row', style: { alignItems: 'baseline', gap: '.5rem' } },
+              App.el('span', { class: 'num-lg' }, week + ' h'),
+              App.el('span', { class: 'tiny muted' }, 'of ' + ceiling + ' h ceiling · target ' + target + ' h'))),
+          App.el('div', { class: 'btn-row' },
+            [1, 2, 4].map(function (n) {
+              return App.el('button', { class: 'btn sm', onclick: function () {
+                App.addHours(App.today(), n);
+                paint();
+                App.renderSideMini();
+              } }, '+' + n + 'h');
+            }),
+            App.el('button', { class: 'btn sm ghost', onclick: function () {
+              App.addHours(App.today(), -1);
+              paint();
+              App.renderSideMini();
+            } }, '−1h')
+          )
+        ),
+        App.el('div', { class: 'meter ' + (week > ceiling ? 'bad' : week > target ? 'warn' : ''), style: { margin: '.7rem 0' } },
+          App.el('i', { style: { width: Math.min(100, (week / ceiling) * 100) + '%' } })),
+        App.bars(values, { labels: days.map(function (x) { return App.fmtDate(x, 'short'); }), todayIndex: 13, over: 8, unit: 'h', height: 44, min: maxH }),
+        App.el('div', { class: 'tiny muted', style: { marginTop: '.3rem' } }, 'Last 14 days · orange = today · red = over 8 hours')
+      );
+    }
+    paint();
+    return host;
   }
 
   /* =========================== PROJECTS GRID ============================= */

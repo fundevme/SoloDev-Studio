@@ -49,115 +49,222 @@
   };
 
   /* =============================== CAMPAIGN ============================== */
+
+  /* Start with the ready-made six-phase campaign. Every phase gets its own
+     checklist, so it can be edited, reordered and deleted like any other. */
+  function useCampaignTemplate(g) {
+    g.marketing.campaigns = App.data.campaignTemplate.map(function (c, i) {
+      return {
+        id: App.uid('c'), phase: c.phase, when: c.when, goal: c.goal,
+        done: false, open: i <= 1,
+        tasks: c.tasks.map(function (t) { return { text: t, done: false }; })
+      };
+    });
+    App.Store.save();
+    App.confetti(20);
+    App.renderRoute();
+  }
+
   function tabPlan(root, g) {
     g.marketing.campaigns = g.marketing.campaigns || [];
 
     if (!g.marketing.campaigns.length) {
       root.append(App.empty({
         title: 'No campaign yet',
-        body: 'A campaign is six phases that take you from today to a month after launch. Each one has a single job. Start from the template and delete what does not apply.',
-        action: App.el('button', { class: 'btn primary', onclick: function () {
-          g.marketing.campaigns = App.data.campaignTemplate.map(function (c, i) {
-            return { id: App.uid('c'), phase: c.phase, when: c.when, goal: c.goal, done: false, open: i <= 1 };
-          });
-          g.marketing.tasks = g.marketing.tasks || {};
-          App.data.campaignTemplate.forEach(function (c) {
-            g.marketing.tasks[c.phase] = c.tasks.map(function () { return false; });
-          });
-          App.Store.save();
-          App.confetti(20);
-          App.renderRoute();
-        } }, 'Start from the template')
+        body: 'A campaign is a set of phases that take you from today to a launch and beyond. Start from the ready-made six-phase template, or add your own phases and write your own checklists.',
+        ico: 'M3 11v2a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1z|M15 8.5a4 4 0 0 1 0 7',
+        action: App.el('div', { class: 'btn-row', style: { justifyContent: 'center' } },
+          App.el('button', { class: 'btn primary', onclick: function () { useCampaignTemplate(g); } }, 'Start from the template'),
+          App.el('button', { class: 'btn', onclick: function () { addPhase(g); } }, '+ Add your own phase'))
       }));
       return;
     }
 
-    g.marketing.tasks = g.marketing.tasks || {};
-
     root.append(App.el('div', { class: 'callout info' },
       App.el('div', { class: 'ct' }, 'Do them in order'),
-      App.el('p', {}, 'Each phase has one job. Doing phase four before phase two is how launch week becomes a panic.')),
-      App.el('div', { class: 'stack' }, g.marketing.campaigns.map(function (c, i) {
-        var tpl = App.data.campaignTemplate.filter(function (x) { return x.phase === c.phase; })[0];
-        var tasks = tpl ? tpl.tasks : [];
-        var state = g.marketing.tasks[c.phase] || tasks.map(function () { return false; });
-        g.marketing.tasks[c.phase] = state;
-        var done = state.filter(Boolean).length;
+      App.el('p', {}, 'Each phase has one job. Doing phase four before phase two is how launch week becomes a panic. Use the arrows to reorder a phase and Edit to change its name, job or checklist.')));
 
-        var card = App.el('div', { class: 'card' + (c.done ? ' tint' : '') });
-        var head = App.el('div', { class: 'row between', style: { cursor: 'pointer' }, onclick: function () {
-          c.open = !c.open;
-          App.Store.save();
-          body.hidden = !c.open;
-        } },
-          App.el('div', { class: 'row', style: { gap: '.6rem', minWidth: 0 } },
-            App.el('span', { class: 'badge ' + (done === tasks.length && tasks.length ? 'good' : c.done ? 'good' : 'gray') }, done === tasks.length && tasks.length ? 'done' : 'phase ' + (i + 1)),
-            App.el('div', { style: { minWidth: 0 } },
-              App.el('div', { class: 'card-t' }, c.phase),
-              App.el('div', { class: 'tiny muted' }, c.when))),
-          App.el('div', { class: 'row', style: { gap: '.5rem' } },
-            App.el('span', { class: 'tiny muted' }, done + '/' + tasks.length),
-            App.el('span', { class: 'muted' }, c.open ? '▾' : '▸')));
-
-        var body = App.el('div', { class: 'stack', style: { marginTop: '.7rem', display: c.open ? '' : 'none' } },
-          App.el('p', { class: 'card-s' }, c.goal));
-
-        tasks.forEach(function (t, ti) {
-          body.append(App.el('div', { class: 'chk-row' },
-            App.el('div', { class: 'chk-box' + (state[ti] ? ' on' : ''), onclick: function () {
-              state[ti] = !state[ti];
-              App.Store.save();
-              App.renderRoute();
-            } }),
-            App.el('label', { class: state[ti] ? 'done' : '' }, t)));
-        });
-
-        card.append(head, body,
-          App.el('div', { class: 'btn-row', style: { marginTop: '.6rem' } },
-            App.el('button', { class: 'btn sm' + (c.done ? ' ghost' : ' primary'), onclick: function () {
-              c.done = !c.done;
-              App.Store.save();
-              if (c.done) App.confetti(18);
-              App.renderRoute();
-            } }, c.done ? 'Reopen this phase' : 'Mark this phase finished')));
-        return card;
-      })));
+    root.append(App.el('div', { class: 'stack' }, g.marketing.campaigns.map(function (c, i) {
+      return phaseCard(g, c, i);
+    })));
 
     root.append(App.el('div', { class: 'btn-row', style: { marginTop: '1rem' } },
-      App.el('button', { class: 'btn sm', onclick: function () {
-        addPhase(g);
-      } }, '+ Add your own phase'),
+      App.el('button', { class: 'btn sm', onclick: function () { addPhase(g); } }, '+ Add your own phase'),
       App.el('button', { class: 'btn sm ghost', onclick: function () {
         App.presentExport('Marketing plan — ' + g.title, App.slug(g.title) + '_marketing.md', exportPlan(g), 'text/markdown');
       } }, 'Export the plan')));
+  }
+
+  function phaseCard(g, c, i) {
+    var tasks = c.tasks = c.tasks || [];
+    var done = tasks.filter(function (t) { return t.done; }).length;
+    var total = tasks.length;
+
+    var body = App.el('div', { class: 'stack', style: { marginTop: '.7rem' } },
+      c.goal ? App.el('p', { class: 'card-s' }, c.goal) : null);
+
+    if (total) {
+      tasks.forEach(function (t) {
+        var box = App.el('div', { class: 'chk-box' + (t.done ? ' on' : ''), role: 'checkbox', tabindex: '0' });
+        var lab = App.el('label', { class: t.done ? 'done' : '' }, t.text);
+        function toggle() {
+          t.done = !t.done;
+          App.Store.save();
+          App.renderRoute();
+        }
+        box.addEventListener('click', toggle);
+        box.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+        lab.addEventListener('click', toggle);
+        body.append(App.el('div', { class: 'chk-row' }, box, lab));
+      });
+    } else {
+      body.append(App.el('p', { class: 'tiny muted' }, 'No checklist items yet. Use Edit to add some.'));
+    }
+
+    body.append(App.el('div', { class: 'btn-row', style: { marginTop: '.5rem' } },
+      App.el('button', { class: 'link-btn', onclick: function (e) { e.stopPropagation(); editPhase(g, c); } }, 'Edit this checklist')));
+
+    /* A phase usually starts collapsed. Toggling el.hidden works now that the
+       stylesheet makes [hidden] win over .stack's flex display — the old code
+       also wrote display:none inline, so a collapsed phase could never open
+       until a redraw reset it. */
+    body.hidden = !c.open;
+
+    var arrow = App.el('span', { class: 'muted' }, c.open ? '▾' : '▸');
+    var head = App.el('div', { class: 'row between', style: { cursor: 'pointer' }, onclick: function () {
+      c.open = !c.open;
+      body.hidden = !c.open;
+      arrow.textContent = c.open ? '▾' : '▸';
+      App.Store.save();
+    } },
+      App.el('div', { class: 'row', style: { gap: '.6rem', minWidth: 0 } },
+        App.el('span', { class: 'badge ' + ((total && done === total) || c.done ? 'good' : 'gray') }, total && done === total ? 'done' : 'phase ' + (i + 1)),
+        App.el('div', { style: { minWidth: 0 } },
+          App.el('div', { class: 'card-t' }, c.phase),
+          c.when ? App.el('div', { class: 'tiny muted' }, c.when) : null)),
+      App.el('div', { class: 'row', style: { gap: '.5rem' } },
+        App.el('span', { class: 'tiny muted' }, done + '/' + total),
+        arrow));
+
+    var actions = App.el('div', { class: 'btn-row', style: { marginTop: '.6rem' } },
+      App.el('button', { class: 'btn sm' + (c.done ? ' ghost' : ' primary'), onclick: function () {
+        c.done = !c.done;
+        App.Store.save();
+        if (c.done) App.confetti(18);
+        App.renderRoute();
+      } }, c.done ? 'Reopen this phase' : 'Mark this phase finished'),
+      App.el('button', { class: 'btn sm', onclick: function () { editPhase(g, c); } }, 'Edit'),
+      i > 0 ? App.el('button', { class: 'btn sm ghost', title: 'Move this phase earlier', onclick: function () {
+        g.marketing.campaigns.splice(i - 1, 0, g.marketing.campaigns.splice(i, 1)[0]);
+        App.Store.save(); App.renderRoute();
+      } }, '↑') : null,
+      i < g.marketing.campaigns.length - 1 ? App.el('button', { class: 'btn sm ghost', title: 'Move this phase later', onclick: function () {
+        g.marketing.campaigns.splice(i + 1, 0, g.marketing.campaigns.splice(i, 1)[0]);
+        App.Store.save(); App.renderRoute();
+      } }, '↓') : null,
+      App.el('button', { class: 'btn sm danger', onclick: function () { deletePhase(g, c); } }, 'Delete'));
+
+    return App.el('div', { class: 'card' + (c.done ? ' tint' : '') }, head, body, actions);
   }
 
   function addPhase(g) {
     var name = App.el('input', { type: 'text', placeholder: 'e.g. The launch stream' });
     var when = App.el('input', { type: 'text', placeholder: 'e.g. Launch day' });
     var goal = App.el('input', { type: 'text', placeholder: 'What is the one job of this phase?' });
+    var items = App.el('textarea', { style: { minHeight: '96px' }, placeholder: 'One checklist item per line, e.g.\nBook the stream slot\nWrite the run of show\nPost the VOD' });
     var m = App.modal({
-      title: 'Add a phase', narrow: true,
+      title: 'Add a phase', wide: true,
       body: App.el('div', {},
-        App.field('Name', name), App.field('When', when), App.field('Job', goal),
+        App.field('Name', name),
+        App.el('div', { class: 'field-row' },
+          App.field('When', when),
+          App.field('The single job of this phase', goal)),
+        App.field('Checklist', items, 'One item per line. You can add, rename or remove items at any time.'),
         App.el('div', { class: 'modal-foot' },
           App.el('button', { class: 'btn primary', onclick: function () {
             if (!name.value.trim()) { App.toast('Give it a name.', 'warn'); return; }
-            g.marketing.campaigns.push({ id: App.uid('c'), phase: name.value.trim(), when: when.value, goal: goal.value, done: false, open: true });
+            g.marketing.campaigns.push({
+              id: App.uid('c'), phase: name.value.trim(), when: when.value.trim(), goal: goal.value.trim(),
+              done: false, open: true, tasks: linesToTasks(items.value)
+            });
             App.Store.save(); m.close(); App.renderRoute();
-          } }, 'Add')))
+          } }, 'Add phase')))
     });
+  }
+
+  /* Edit a phase's name, timing, job and checklist. Done states are kept for
+     items that still exist; new lines start unticked. */
+  function editPhase(g, c) {
+    c.tasks = c.tasks || [];
+    var name = App.el('input', { type: 'text', value: c.phase || '' });
+    var when = App.el('input', { type: 'text', value: c.when || '' });
+    var goal = App.el('input', { type: 'text', value: c.goal || '' });
+    var work = c.tasks.map(function (t) { return { text: t.text, done: !!t.done }; });
+    var list = App.el('div', { class: 'stack', style: { gap: '.4rem' } });
+
+    function draw() {
+      App.clear(list);
+      work.forEach(function (t, i) {
+        var inp = App.el('input', { type: 'text', value: t.text, placeholder: 'Checklist item' });
+        inp.addEventListener('input', function () { t.text = inp.value; });
+        list.append(App.el('div', { class: 'row', style: { gap: '.4rem', alignItems: 'center' } },
+          inp,
+          App.el('button', { class: 'link-btn', title: 'Remove this item', onclick: function () { work.splice(i, 1); draw(); } }, '✕')));
+      });
+      if (!work.length) list.append(App.el('p', { class: 'tiny muted' }, 'No items yet.'));
+      list.append(App.el('button', { class: 'btn sm', onclick: function () { work.push({ text: '', done: false }); draw(); } }, '+ Add checklist item'));
+    }
+    draw();
+
+    var m = App.modal({
+      title: 'Edit phase', wide: true,
+      body: App.el('div', {},
+        App.el('div', { class: 'field-row' },
+          App.field('Name', name),
+          App.field('When', when)),
+        App.field('The single job of this phase', goal),
+        App.el('div', { class: 'section-head' }, App.el('div', {},
+          App.el('h3', { class: 'h3' }, 'Checklist'),
+          App.el('p', { class: 'tiny muted' }, 'Tick items off on the phase card as you finish them.'))),
+        list,
+        App.el('div', { class: 'modal-foot' },
+          App.el('button', { class: 'btn primary', onclick: function () {
+            if (!name.value.trim()) { App.toast('Give the phase a name.', 'warn'); return; }
+            c.phase = name.value.trim();
+            c.when = when.value.trim();
+            c.goal = goal.value.trim();
+            c.tasks = work.filter(function (t) { return String(t.text).trim(); })
+              .map(function (t) { return { text: String(t.text).trim(), done: !!t.done }; });
+            App.Store.save(); m.close(); App.renderRoute();
+          } }, 'Save changes')))
+    });
+  }
+
+  function deletePhase(g, c) {
+    App.confirm({
+      title: 'Delete this phase?',
+      body: '“' + c.phase + '” and its checklist will be removed from the plan.',
+      confirmText: 'Delete it', danger: true
+    }).then(function (ok) {
+      if (!ok) return;
+      g.marketing.campaigns = g.marketing.campaigns.filter(function (x) { return x !== c; });
+      App.Store.save();
+      App.toast('Phase deleted.');
+      App.renderRoute();
+    });
+  }
+
+  function linesToTasks(text) {
+    return String(text || '').split('\n').map(function (s) { return s.trim(); })
+      .filter(Boolean).map(function (t) { return { text: t, done: false }; });
   }
 
   function exportPlan(g) {
     var out = ['# Marketing plan — ' + g.title, ''];
     (g.marketing.campaigns || []).forEach(function (c) {
-      var tpl = App.data.campaignTemplate.filter(function (x) { return x.phase === c.phase; })[0];
-      var tasks = tpl ? tpl.tasks : [];
-      var state = (g.marketing.tasks || {})[c.phase] || [];
       out.push('## ' + c.phase + '  (' + (c.when || '') + ')');
-      out.push(c.goal || '');
-      tasks.forEach(function (t, i) { out.push('- [' + (state[i] ? 'x' : ' ') + '] ' + t); });
+      if (c.goal) out.push(c.goal);
+      (c.tasks || []).forEach(function (t) { out.push('- [' + (t.done ? 'x' : ' ') + '] ' + t.text); });
       out.push('');
     });
     return out.join('\n');

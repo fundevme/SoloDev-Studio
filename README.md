@@ -1,4 +1,4 @@
-# SoloDev Studio 2.2.8
+# SoloDev Studio 2.3.0
 
 **Plan your game. Design it. Check the market. Tell people about it.**
 
@@ -11,8 +11,8 @@ everything on your own device, and has no accounts, no ads and no telemetry.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevStudio-2.2.8-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevStudio-2.2.8.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevStudio-2.3.0-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevStudio-2.3.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
@@ -20,7 +20,57 @@ everything on your own device, and has no accounts, no ads and no telemetry.
 
 ---
 
-## What is new in 2.2.8
+## What is new in 2.3.0
+
+**Campaigns are yours to shape.** Each phase now carries its own checklist, so
+you can build the marketing plan around your game instead of the other way
+round. From **Marketing → Campaign** you can:
+
+- **Add your own phase** — a name, a when, a single job and a checklist — with
+  or without starting from the template
+- **Edit any phase**: rename it, change its timing and job, and add, rename or
+  remove checklist items
+- **Delete a phase**, or **move it up and down** to reorder the campaign
+- **Collapse and expand a phase** by tapping it
+
+Collapsing used to work only if you left the page and came back, a phase you
+wrote yourself had no checklist, and renaming a phase quietly orphaned its
+ticks. None of those is true now. Campaigns saved by an earlier version are
+converted automatically, and the six-phase template is still one button.
+
+**Logging hours no longer reloads the page.** The +1h, +2h, +4h and −1h buttons
+used to redraw the whole screen, which flashed and threw away your place. They
+now update the week card in place: the total, the meter and the ring change
+while everything else stays exactly where it was.
+
+**The week ring tells you where you are at a glance.** It had been drawn behind
+a stylesheet rule pointing at a gradient that did not exist, so the coloured arc
+never appeared and the ring sat grey no matter how many hours you logged. It now
+fills as the week builds, and recolours as you cross your target (amber) and
+your ceiling (red).
+
+**Tapping a button no longer flashes a blue box.** Android's WebView was drawing
+its default tap highlight over every control. It is switched off; the app's own
+pressed states remain.
+
+**A new project starts with nothing filled in.** The design document had been
+counting borrowed starter content — a palette, some technical figures, three
+rules and the core loops — as work you had done, so a brand-new project opened
+at "4 of 13 parts filled in". It now opens at 0 of 13. The starter material is
+still offered on each page, as a button or a suggestion, so you never face a
+blank screen.
+
+**Technical limits: "Starter value" is now "Target value", and it is editable.**
+Set your own target on any row and the status column compares your numbers
+against it, not against a fixed example.
+
+**Also fixed:** the page no longer redraws when you log hours from the Plan
+page, and the worked example project still fills in its starter design content
+on purpose.
+
+---
+
+## What was new in 2.2.8
 
 **The starter list no longer counts as your research.** On **Market → Overview**,
 "Similar games tracked" was showing 8 — the number of games in the built-in
