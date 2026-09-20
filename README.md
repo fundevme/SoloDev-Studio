@@ -5,7 +5,7 @@
 
 A companion app for one person making games. It works completely offline, keeps
 everything on your own device, and has no accounts, no ads and no telemetry.
-
+Available on Windows and Android
 ---
 
 ## What you received
