@@ -10,7 +10,7 @@ Available on Windows and Android
 
 ---
 
-## What you received
+## What's here
 
 | File | What it is |
 | --- | --- |
