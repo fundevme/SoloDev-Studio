@@ -1,13 +1,20 @@
+<<<<<<< HEAD
 # SoloDev Studio 2.3.0
+=======
+# SoloDev Studio 2.2.8
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
+>>>>>>> a5cbbe7a07d974a2af22b42062819601b451b0f2
 
 **Plan your game. Design it. Check the market. Tell people about it.**
 
 A companion app for one person making games. It works completely offline, keeps
-everything on your own device, and has no accounts, no ads and no telemetry.
+everything on your own device, and has no accounts, no ads and no telemetry. 
+Available on Windows and Android
+
 
 ---
 
-## What you received
+## What's here
 
 | File | What it is |
 | --- | --- |
