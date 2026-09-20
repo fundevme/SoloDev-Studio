@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="SoloDev Studio — plan your games, design them, research the market and market them. Everything a solo game developer needs, offline.">
+  <meta name="theme-color" content="#0b0f14">
+  <title>SoloDev Studio</title>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+  <!-- ================================ SPLASH ================================ -->
+  <div id="splash" class="splash" role="dialog" aria-label="Welcome to SoloDev Studio">
+    <div class="splash-bg" aria-hidden="true">
+      <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+      <span class="grid-fade"></span>
+    </div>
+    <div class="splash-inner">
+      <div class="splash-mark">
+        <span class="logo-mark big"><i></i><i></i><i></i></span>
+        <span class="splash-brand">SoloDev <b>Studio</b></span>
+      </div>
+
+      <div class="splash-copy">
+        <h1 class="splash-h1">Make games.<br><span class="grad">Without losing the plot.</span></h1>
+        <p class="splash-lead">Plan it, design it, check the market, tell people about it — all in one place. Works offline, keeps everything on your device.</p>
+        <ul class="splash-points">
+          <li><span class="dot d1"></span> Plan your projects and weekly hours</li>
+          <li><span class="dot d2"></span> Write the design document without staring at a blank page</li>
+          <li><span class="dot d3"></span> Research similar games and price yours with confidence</li>
+          <li><span class="dot d4"></span> Build a marketing plan you will actually follow</li>
+        </ul>
+      </div>
+
+      <div class="splash-foot">
+        <div class="splash-progress"><div class="splash-progress-fill" id="splash-fill"></div></div>
+        <div class="splash-status" id="splash-msg">Getting things ready…</div>
+        <button id="splash-enter" class="btn primary lg splash-btn" hidden>Start working</button>
+        <button id="splash-skip" class="link-btn">Don't show this again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================ SHELL ================================= -->
+  <div class="app-shell" id="app-shell">
+
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#/home">
+        <span class="logo-mark"><i></i><i></i><i></i></span>
+        <span class="brand-text">SoloDev<b>Studio</b></span>
+      </a>
+      <nav class="side-nav" id="side-nav" aria-label="Main sections"></nav>
+      <div class="side-foot">
+        <div class="side-mini" id="side-mini"></div>
+        <button class="btn primary block" id="btn-new-game-side">+ New project</button>
+        <p class="tiny muted">Everything is saved on this device only.</p>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar" id="topbar">
+        <button class="icon-btn only-mobile" id="btn-menu" aria-label="Open menu">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="topbar-title">
+          <span class="crumb" id="crumb">Home</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="btn-theme" title="Change theme">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.5 12h2M19.5 12h2M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-backup" title="Save a backup">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-print" title="Print / save as PDF">
+            <svg viewBox="0 0 24 24"><path d="M7 9V3.5h10V9"/><rect x="4" y="9" width="16" height="7.5" rx="2"/><rect x="7" y="14" width="10" height="6.5" rx="1.2"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main id="view-root" class="view-root" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- ============================ MOBILE TAB BAR ============================ -->
+  <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <div id="confetti-root" class="confetti-root" aria-hidden="true"></div>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/guide-roadmap.js"></script>
+  <script src="assets/js/guide-rendering.js"></script>
+  <script src="assets/js/guide-marketing.js"></script>
+  <script src="assets/js/views-home.js"></script>
+  <script src="assets/js/views-plan.js"></script>
+  <script src="assets/js/views-design.js"></script>
+  <script src="assets/js/views-market.js"></script>
+  <script src="assets/js/views-marketing.js"></script>
+  <script src="assets/js/views-learn.js"></script>
+  <script src="assets/js/views-toolbox.js"></script>
+  <script src="assets/js/views-vault.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

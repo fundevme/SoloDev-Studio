@@ -1,0 +1,44 @@
+{
+  "name": "solodev-studio",
+  "productName": "SoloDev Studio",
+  "version": "2.2.8",
+  "description": "Plan, design, research and market your games — a companion for people making games on their own.",
+  "main": "main.js",
+  "author": "SoloDev Studio",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable",
+    "smoke": "electron smoke.js"
+  },
+  "build": {
+    "appId": "com.solodev.studio",
+    "productName": "SoloDev Studio",
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "portable": {
+      "artifactName": "SoloDevStudio-${version}-portable.exe"
+    }
+  }
+}
+

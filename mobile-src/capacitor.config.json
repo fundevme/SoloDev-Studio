@@ -1,0 +1,9 @@
+{
+  "appId": "com.solodev.studio",
+  "appName": "SoloDev Studio",
+  "webDir": "www",
+  "backgroundColor": "#0a0e13",
+  "android": {
+    "allowMixedContent": false
+  }
+}

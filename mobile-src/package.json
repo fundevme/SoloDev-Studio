@@ -1,0 +1,14 @@
+{
+  "name": "solodev-studio-mobile",
+  "version": "1.0.0",
+  "description": "SOLO:DEV Studio — Android wrapper (Capacitor).",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
+}
