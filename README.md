@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # SoloDev Studio 2.3.1
+=======
+# SoloDev Studio
+>>>>>>> 25ac7864613893a74feecd0d710ad9cdc063835d
 <img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan your game. Design it. Check the market. Tell people about it.**
