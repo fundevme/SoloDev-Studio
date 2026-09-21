@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.0
-<img width="1414" height="1381" alt="{D2416B7D-4F1B-48B1-823F-AC273EE67314}" src="https://github.com/user-attachments/assets/79506f6d-96f6-4e84-af99-ce61c18e4f17" />
+# SoloDev Toolbox 3.1.3
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,14 +16,128 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.0-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.3-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.1.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.1.3
+
+**Every main tool now has the same practice desk.** Studio's practice page and
+the four learning tools' practice pages carry the same five things: the
+**Weekly practice target** for that tool, the **Weekly practice target** for
+every tool together, the **What I am working on** plan, the per-tool week
+gauges, and the practice report. Studio gains the "This tool" target it was
+missing — scoped to Pocket Studio and stored separately from the all-tool one,
+so the two can differ — while the learning tools gain the every-tool target
+and the gauges.
+
+**Every tool's Home card shows both week totals as bars.** "Practice this
+week" now has two labelled meters: **All tools** (the whole toolbox against
+the all-tool target, in the accent colour) and the tool's own field (Music,
+3DFoundry, 2DCanvas, Story, and Studio for Studio) against its own target, in
+the secondary colour — so the field total and the toolbox total read at a
+glance instead of hiding in a sentence.
+
+**The Pocket practice tab's "Combined report" link now goes to its main tool.**
+Pocket Music opens Music's practice page, Pocket 3DFoundry opens 3DFoundry's,
+Pocket 2DCanvas opens 2DCanvas's, Pocket Story opens Story's, and Pocket
+Studio opens Studio's — instead of all of them landing on Studio's page.
+
+---
+
+## What is new in 3.1.2
+
+**You choose where exports are saved now, on every platform.** Before, backups
+and the images zip were handed to whatever the shell did by default — a download
+that landed wherever the desktop or browser put it, and a cache file passed to
+the Android share sheet. The Save button now asks:
+
+- **Windows app** — a real **Save as** dialog, starting in your Downloads folder
+  with the filename filled in and the right filter (JSON backup, zip archive,
+  Markdown, text). The file is written exactly where you point it.
+- **Android app** — the system **create-document picker** (Storage Access
+  Framework): choose the folder and the filename, anywhere the picker can reach,
+  including Downloads, Documents, an SD card or Drive. Cancelling is treated as
+  a cancel, not an error. This is a new local plugin (`SoloDevSave`), not a
+  fixed folder.
+- **Browser** — the File System Access picker where the browser offers it, and
+  the ordinary download flow everywhere else.
+
+Every export uses it: the JSON backup (top bar and Vault), the stored-images
+zip, and the Vault template "Save as file" buttons.
+
+**Tapping the logo does nothing.** The brand marks in the sidebar and the top
+bar were links back to the cover; they are plain labels now, so a stray tap at
+the top of the screen cannot interrupt what you were doing. The cover is still
+one tap away — **All tools** in the drawer, or **Switch tool…** in the top bar.
+
+**Small text fix:** the action guide's frame-data cards read "3–8 fr", "2–4 fr"
+and so on; they now say **frames**, spelled out.
+
+**The practice report is on every practice page.** The all-tool report — this
+week, last 30 days, all time, by tool, by project, and the last 14 days — used
+to live only on Studio's Practice page. Every learning tool's Practice page now
+carries it as well: Studio, Music, 3DFoundry, 2DCanvas and Story. (The Pocket
+tools' Practice tab is their own session log and stays as it was.) The Studio
+practice page also no longer offers its "Open the practice plan" shortcut,
+which only pointed at the page you were already on.
+
+**"Practice this week" now lives only on Home pages — and shows both numbers.**
+The card on Studio's Home gives the all-tool week and, under it, the separate
+Pocket Studio number; each learning tool's Home card gives that tool's week and
+the all-tool total. It appears nowhere else: on a practice page the **Weekly
+practice target** card is the weekly number, and on Studio it is followed by
+the per-tool gauges below. (3.1.3 turned those two numbers into two labelled
+bars — see above.)
+
+**Fixed: clicking a moodboard image opened the first one.** When the image URLs
+were already cached — which is exactly what happens once the board has drawn —
+the full-screen viewer was created in the middle of the scan with only the
+first tile in its list. It now waits for every tile before opening, on the
+moodboard and on each tool's design references. Tapping a tile opens that tile,
+with the right "n of m" counter.
+
+**Fixed: the Build drill jumped the page.** Pause and Resume rebuilt the whole
+drill card, which took the button out from under the tap and scrolled the page
+on some platforms, Android in particular. The card now updates its clock,
+badge, steps and buttons in place, so the button stays put and the page does
+not move.
+
+**Studio's weekly number now breaks down per tool.** The weekly target on the
+Studio Practice page counts every Pocket tool at once, which made Pocket Studio
+practice invisible on its own. A new **This week, by tool** card sits under the
+target with one gauge per Pocket tool — Pocket Studio included — each showing
+that tool's share of the same weekly target, so a week of Studio-only sessions
+reads as its own number.
+
+---
+
+## What is new in 3.1.1
+
+**Android now has no bottom bar.** Every section stays in the drawer, which
+opens from the tray button in the top bar, so the bottom of the screen is clear
+again on a phone. The bar is untouched on Windows and the web, where it is still
+the quick way around a narrow window. (This is Android-only: `html.android-app`
+hides the tab bar, and pages drop their tab-strip clearance so they only reserve
+room for the system navigation bar.)
+
+**The drawer's stats and New project button are visible again on Android.**
+They were being pushed behind the system navigation bar: the drawer is
+edge-to-edge, so its last rows sat under the Android buttons while the tab bar
+(which had its own bottom padding) did not. The drawer now reserves the bottom
+safe area exactly like the bar did — Projects, This week, In progress and
+**+ New project** all stay on screen.
+
+The Android-shell smoke test now asserts both: the bottom bar is hidden, and the
+drawer's foot is on screen with its three stat rows, the New project button and
+the bottom safe-area padding in place.
 
 ---
 
@@ -45,7 +159,8 @@ slivers, so every icon and label stays readable and finger-sized without
 sideways scrolling; it returns to a single row whenever there is room, and
 re-lays itself out on rotation and resize. Across the tested phone widths
 (320, 360 and 540 px) the narrowest tab measured 48 px and nothing was pushed
-off the edge.
+off the edge. (Android later dropped the bar entirely — see 3.1.1 above — so
+there the drawer is the navigation.)
 
 **The sidebar tray button works on mobile again, including the Android app.**
 The hamburger was previously hidden and the drawer disabled inside the APK; now
@@ -700,6 +815,7 @@ every picture plus a `manifest.json` (metadata, hashes and the board pins) into
 one zip, and reads it back with duplicate detection, a progress bar and a
 per-file error list. Missing projects are recreated so the boards have a home.
 On Android the zip goes to the system share sheet; everywhere else it downloads.
+(3.1.2 later gave every export a destination picker — see the top of this file.)
 
 **Bug fixes.**
 
@@ -1100,6 +1216,12 @@ and in app-private storage on Android. There is no cloud and no account.
 every project, design document, task, moodboard, note, marketing plan, module
 progress and Pocket session log. It moves cleanly between the desktop and
 Android builds.
+
+When you save anything out — a backup, the images zip, a template — the app
+asks **where**: the Windows build opens a real **Save as** dialog starting in
+your Downloads folder, the Android build opens the system file picker so you
+choose the folder and the filename, and a browser uses its own save flow. Every
+export stays on your device; nothing is uploaded or sent anywhere.
 
 Moodboard pictures are stored separately at full size. Use
 **Settings → Stored images → Export all images (.zip)** to take those with you
