@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.3
-<img width="1354" height="1066" alt="{60721776-BB2F-4544-A2D9-BF1D96B44F8E}" src="https://github.com/user-attachments/assets/ae3e14bb-6712-4eda-aeff-4a32da9444ee" />
+# SoloDev Toolbox 3.1.4
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,14 +16,38 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.3-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.4-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.1.4.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.1.4
+
+**The "← All tools" button is gone from page heads.** It appeared under the
+title on Studio's Home, on every learning tool's pages, on the practice page
+and inside the Pocket tools — and the cover was already one tap away in the
+drawer's **All tools** entry and the top bar's **Switch tool…** button, so the
+extra button only added noise. Page heads now go straight to their content on
+every platform. The drawer entry and the switcher are untouched.
+
+**The logo now leads to your tool's Home.** Tapping the brand mark — in the
+sidebar or the top bar — goes to the Home page of the tool you are in: Studio's
+Home in Studio, Music's Home in Music, 3DFoundry's in 3DFoundry, and so on; in
+a Pocket tool it opens that Pocket tool's session page. It is the familiar
+"logo goes home" behaviour, scoped to the tool rather than throwing you back
+to the cover.
+
+**Fixed: timer progress bars now fill while they run.** Every timed routine's
+meter — the Music and 3DFoundry sprint clocks, 2DCanvas's studio clock, Story's
+sprint clock and the Build drill — only moved when you pressed a button,
+because the ticker updated the clock text and nothing else. The tickers now
+update the meter on every tick, so the bar fills as the phase counts down.
 
 ---
 
@@ -77,6 +101,7 @@ zip, and the Vault template "Save as file" buttons.
 bar were links back to the cover; they are plain labels now, so a stray tap at
 the top of the screen cannot interrupt what you were doing. The cover is still
 one tap away — **All tools** in the drawer, or **Switch tool…** in the top bar.
+(3.1.4 later made the logo lead to the current tool's Home instead.)
 
 **Small text fix:** the action guide's frame-data cards read "3–8 fr", "2–4 fr"
 and so on; they now say **frames**, spelled out.
