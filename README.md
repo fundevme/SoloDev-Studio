@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.8
-<img width="1865" height="1041" alt="656133807-e2f2db49-690d-4e92-952c-81739ac8f102" src="https://github.com/user-attachments/assets/a2b6c0e8-9a31-4c06-80aa-a23449be4210" />
+# SoloDev Toolbox 3.2.1
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,56 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.8-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.8.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.1.8-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.2.1-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.2.1.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.2.1-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.2.1
+
+**Every tool has its colour back, tuned to the new palette.** The 3.2.0 logos
+were all moss-green, which lost which tool was which — Story, for one, stopped
+being blue. Each mark now keeps its own hue again: Studio green, Music violet,
+3DFoundry orange, 2DCanvas teal and Story blue — but muted to earthy, mid-tone
+shades so they sit with the paper, ink and moss chrome instead of shouting over
+it. The same tuned colours drive each tool's accents (the card top borders and
+module headers) and the splash screen.
+
+**The splash screen shows the real tool marks.** The little coloured dots in
+the intro list are gone: each line now carries the tool's actual logo, so the
+list reads as the five tools (and the Pocket mark) rather than six abstract
+dots.
+
+---
+
+## What is new in 3.2.0
+
+**A new look: warm field-notes editorial.** The app now wears the palette and
+type of a printed field guide instead of a dark dashboard. **Field notes** —
+warm paper, soft ink and moss — is the default theme; **Linen** is the light
+one and **Greenhouse** the deep night one, all three still one tap away in
+Settings or behind the top-bar theme button. Headings are set in Newsreader,
+UI labels stay in Archivo, corners are softer, shadows are warm, and the neon
+gradients are gone. It is the same app to use — just calmer to look at.
+
+**Every logo is redrawn, and every one is transparent.** The thirteen brand
+marks — Toolbox, Studio, Music, 3DFoundry, 2DCanvas, Story and the five Pocket
+marks — are new artwork in the same moss, lichen and amber palette. None of
+them sits on a coloured tile any more, so they read cleanly on paper, on linen
+and on greenhouse. The desktop icon, Android launcher icons, store icon and
+Android splash screen were rebuilt from the new artwork.
+
+**Everything still works the same way.** Same screens, same buttons, same
+behaviour and the same saved data. The redesign is stylesheet and artwork only:
+no feature was removed, and nothing about existing projects, designs,
+moodboards or logs changed shape.
 
 ---
 
