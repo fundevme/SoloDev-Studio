@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.4
-<img width="1715" height="1048" alt="{C3389F54-AC4E-4B0C-B4BD-B7E7AEF67D98}" src="https://github.com/user-attachments/assets/01f66423-25bc-4e0c-913f-ba5051bd9c90" />
+# SoloDev Toolbox 3.1.5
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,14 +16,52 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.4-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.4.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.5-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.1.5.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.5-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.1.5
+
+**Every tool now keeps several designs, and each one has its own moodboard.**
+The Design page in Music, 3DFoundry, 2DCanvas and Story used to hold one
+document and one set of references. It now holds a list of named designs —
+"Forest shrine", "Title screen", whatever the thing is — with a picker to
+switch between them. Each design carries its own written fields **and its own
+built-in moodboard**: images and colours pinned beside it, never shared with
+another design, another tool or Studio's moodboard. Old single-document data is
+moved into a first design called "Design 1" automatically, so nothing is lost.
+The page exports one design or all of them as Markdown.
+
+**Designs can be deleted.** A **Delete** button on the design header removes
+the selected design after a confirmation. Its written fields and moodboard pins
+go with it; a stored picture is only removed from the device when no other
+board is still using it, so shared references stay intact. **Rename** and
+**+ New design** sit beside it.
+
+**The Home page's "What is inside" cards are tappable links now.** On Studio's
+Home, the eight cards under **What is inside** (Plan, Design, Market,
+Marketing, Toolbox, Build, Learn, Vault) were plain text — tapping them did
+nothing, on any platform. They are real links to their pages now, which also
+makes them work in the Android WebView, where taps outside a link were never
+guaranteed to register. The three navigation buttons under **Start here** were
+turned into links for the same reason.
+
+**One zip now backs up the whole toolbox — data and images together.** The
+Vault's Backups card gains **Save everything (.zip)** and **Restore everything
+(.zip)**. The archive holds every project, task, note, design, setting and
+stored picture at full size in a single file. Restoring replaces what is on the
+device and relinks every moodboard tile and design pin to the stored image —
+including when the picture was already on the device, in which case the
+existing copy is reused instead of duplicated. The old JSON-only backup and
+images-only zip are still there under the same card.
 
 ---
 
