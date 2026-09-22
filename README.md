@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.5
-<img width="1865" height="1041" alt="{3231A38A-14D8-40F6-9B75-486AC4BE9C6B}" src="https://github.com/user-attachments/assets/e2f2db49-690d-4e92-952c-81739ac8f102" />
+# SoloDev Toolbox 3.1.7
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,9 +16,9 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.5-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.5.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.1.5-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.1.7-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.1.7.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.7-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
@@ -28,7 +28,7 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
-## What is new in 3.1.5
+## What is new in 3.1.7
 
 **Every tool now keeps several designs, and each one has its own moodboard.**
 The Design page in Music, 3DFoundry, 2DCanvas and Story used to hold one
@@ -62,6 +62,13 @@ device and relinks every moodboard tile and design pin to the stored image —
 including when the picture was already on the device, in which case the
 existing copy is reused instead of duplicated. The old JSON-only backup and
 images-only zip are still there under the same card.
+
+**Fixed: the hours counter stops at zero, and "Last week" never shows a
+minus.** Taking an hour off a day that has none left now simply leaves the day
+empty instead of writing a zero entry, and the **−1h** button on the week card
+is disabled until there is an hour to take off. The **Last week** stat used to
+read "2 h · −2" whenever this week's total was behind last week's; it now shows
+last week's total alone, so the change readout never drops below zero.
 
 ---
 
