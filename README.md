@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.1.7
-<img width="1865" height="1041" alt="image" src="https://github.com/user-attachments/assets/d384514b-5f7e-4f32-9ca1-6eaeeafe5220" />
+# SoloDev Toolbox 3.1.8
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,39 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.1.7-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.1.7.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.1.7-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.1.8-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.1.8.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.1.8-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.1.8
+
+**Fixed: the splash screen no longer clips on short or scaled screens.** On a
+phone in landscape, a laptop at 150% display scaling, or any window shorter
+than the intro, the bottom of the splash — the status line, **Start working**
+and **Don't show this again** — was cut off, and because the container refused
+to scroll there was no way to reach it. The splash now scrolls when the content
+does not fit and only centres itself when there is room to, so every control
+stays reachable on any screen.
+
+**Fixed: restoring a full backup can no longer hang.** A zip whose manifest
+said it was an images-only archive was refused with no answer, so the Restore
+dialog sat waiting forever. It now reports the problem and points at **Import
+images** instead. Restoring also applies the backup's own theme and effects
+settings immediately, rather than at the next launch.
+
+**Fixed: a day can no longer log more than 24 hours.** The **+1h / +2h / +4h**
+buttons on the week card could push a day past 24 h — the day dialogs always
+capped at 24 — and the toast still claimed the hour was logged. The buttons are
+now disabled once the day is full, every path caps at 24 hours, and the 14-day
+editor's running total matches what saving will store.
 
 ---
 
