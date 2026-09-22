@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.2.8
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/2874b33d-45ce-47ea-9783-2206ba32d024" />
+# SoloDev Toolbox 3.3.3
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,168 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.2.8-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.2.8.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.2.8-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.3.3-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.3.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.3.3-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.3.3
+
+**Fixed: moving a pin reloaded the moodboard, most boards could not move pins
+at all, and moving one in a tool moodboard jumped the page.** The arrows on a
+pin called a full page render, which replays the page entrance and the pop-in
+on every tile — it read exactly like the app reloading. Moving a pin now
+repaints only that board's grid, so the only thing that changes is the order:
+
+- **Every moodboard can move its pins.** The project moodboard in Studio and
+  the built-in moodboard of every design in every tool (Music, 3DFoundry,
+  2DCanvas, Story) now carry the same **‹ ›** arrows. Before this, a design
+  moodboard had no way to move a pin at all.
+- **Drag a pin to move it.** With a mouse or trackpad you can drag any tile
+  onto another to place it before or after it (a bar marks where it will land).
+  The tile is the drag source; the picture inside it is not, so the browser can
+  never navigate to the image file — the other way a move could look like a
+  reload. The arrows remain the way to move pins on a touch screen.
+- **The saved order is the shown order.** A move is written to the store the
+  moment it happens, and reopening the board shows the same arrangement.
+- **The page stays where you left it.** Moving a pin in a tool moodboard
+  emptied the whole board card while it repainted: the page became shorter for
+  a moment, the browser clamped the scroll position to the shorter page, and
+  the rebuilt board left it there — the page appeared to jump up on its own.
+  In-place repaints now remember and restore the scroll position
+  (`App.keepScroll`), and the board card and grid survive a move instead of
+  being torn down.
+- **"Pin from another board" is on the Studio moodboard too.** It used to sit
+  at the very bottom of the page, under the palette starters. It now sits with
+  **+ Pin to board** and **View the whole board** in the board's own controls,
+  exactly where every other board carries it.
+- **Pictures can no longer be dragged as files.** Every tile picture (and
+  every other picture in the app) now carries `-webkit-user-drag: none`. A
+  dragged picture in a WebView could navigate the window to the image file,
+  which is a real reload — and the app screen is gone with it.
+
+The smoke suite's `BOARD_MOVE` check moves a pin on a project moodboard and on
+a tool design moodboard with the arrows, drags one with real drag events, and
+fails if either board re-renders the route, tears out or rebuilds the board
+card or grid it is moving pins in (which is what made the page jump), leaves
+the store order out of step with the board, or drags without showing the drop
+mark. It also checks that Studio's board carries its own "Pin from another
+board" button above the grid.
+
+---
+
+## What is new in 3.3.2
+
+**No duplicate pictures on one moodboard — but sharing between boards is
+untouched.** The same file can still sit on a project moodboard and on any
+number of design moodboards; what it cannot do is appear twice on the *same*
+board. Every add path now refuses it:
+
+- **"Choose from this device"** on a project moodboard or a design moodboard
+  skips any file the board already holds (the store recognises a file by its
+  content, so a second copy is the same id) and says how many were skipped.
+  Picking the same file twice in one batch is caught the same way.
+- **"Pin from another board"** already left out what the current board holds
+  (3.3.1); selecting the same file on two different boards in the picker now
+  returns a single pin, and the receiving board re-checks before it links.
+- **Pasted links** are also refused when the exact same link is already pinned
+  on that board.
+
+Colours, gradients and notes are untouched — those are drawn material, not
+files, and repeating one on a board is legitimate. The smoke suite's
+`NO_DUPLICATES` check adds the same file to the same project board and the same
+design board twice (both refused) and picks it from two boards into an empty
+one (pinned exactly once, proving cross-board sharing still works).
+
+---
+
+## What is new in 3.3.1
+
+**Fixed: the picker offered pictures that were already pinned on the board you
+were looking at.** Selecting one would have put the same file on the same board
+twice. "Pin from another board" now knows what the current board already holds
+and leaves those files out — a board with a mix of shared and new pictures
+offers only the new ones, and if there is nothing new anywhere the picker says
+so instead of opening an empty list. The smoke suite's `BOARD_SHARING` check now
+covers it: the file already on the board must not be offered, and the one that
+is offered must be the file that gets linked.
+
+---
+
+## What is new in 3.3.0
+
+**Fixed: the "Pin from another board" picker showed empty tiles.** Every tile
+in the app fades its picture in by adding an `in` class once the image loads;
+the picker's tiles never got that class, so a perfectly good thumbnail sat at
+**opacity 0** and the tile looked blank — which is exactly what it looked like:
+missing thumbnails. The picker now:
+
+- adds the fade class on load (and when a picture resolves from cache),
+- shows the **audio placeholder** for audio pins instead of a broken image,
+- shows the same grey "no preview" glyph the boards use when a file cannot be
+  shown, instead of an empty box.
+
+Audited every other place tiles render a picture (project moodboards, design
+moodboards, video stills, the pending-file preview); all of them already added
+the class. The smoke suite now has a `PICKER_THUMBS` check that stores a real
+picture on one board, opens the picker from another, and fails if the picture
+never loads, never fades in, or if an audio pin shows as a broken image.
+
+---
+
+## What is new in 3.2.9
+
+**Moodboard sharing is global now.** The image store always held one copy of a
+file no matter how many boards pinned it — but only Studio's project moodboard
+showed it. Every board in the app is now a first-class board:
+
+- **The "shared" badge appears on every board.** Pin the same picture on a
+  project moodboard and on a design moodboard in Music, 3DFoundry, 2DCanvas or
+  Story, and each pin is marked **shared** so you can see the file is kept
+  alive by more than one board.
+- **"Pin from another board" is on every board.** The picker lists every board
+  in the app that holds a file — project moodboards and every design's
+  moodboard, in every tool — with thumbnails and the board it came from. It
+  never offers the board you are already on. Picking a file links it: nothing
+  is copied, the file stays stored once, and removing it from one board leaves
+  the other untouched.
+- The Studio moodboard's old "Import from another board" button (which could
+  only see other *projects*) has become this global picker. The copy that said
+  a design's moodboard "never appears in another tool" was wrong and is gone.
+
+The smoke suite now holds a `BOARD_SHARING` check: a file pinned on a project
+moodboard and on a tool design must count as shared from both sides, show its
+badge on both boards, and be offered by the picker on either one.
+
+**Less memory held for images, without giving up the speed.** The app used to
+keep every full-size picture it had ever shown resolved in memory for the whole
+session, and opening a moodboard resolved the entire board's originals before
+showing the first one. Now:
+
+- **The viewer resolves one file at a time.** It reads the picture it is
+  showing, prefetches the next one so swiping stays instant, and nothing else.
+  A 100-image board opens as fast as a 3-image one and holds a fraction of the
+  memory.
+- **The full-size URL cache is a small most-recently-used set** (four files,
+  with a short grace period so a picture that is still loading can never be
+  revoked out from under the screen). Anything evicted is simply read from the
+  device again when it is next asked for — milliseconds.
+- **Adding pictures no longer pins them all in memory.** Importing a batch used
+  to keep every original (and any video) alive from the moment it was stored;
+  tiles use the 800px copy, so the originals now wait until they are viewed.
+- **Thumbnails keep a generous cap** (180), so tiles stay quick on big boards,
+  and each one is regenerated only if it ever needs to be.
+
+The smoke suite's `CACHE_BOUNDS` check opens a six-image board and fails if the
+viewer resolves the whole board — the old behaviour — rather than the picture
+being looked at.
 
 ---
 
