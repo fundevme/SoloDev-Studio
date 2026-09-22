@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.2.3
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/60ab6d2b-7ea3-4d83-b709-089e32313ed2" />
+# SoloDev Toolbox 3.2.8
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,122 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.2.3-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.2.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.2.3-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.2.8-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.2.8.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.2.8-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.2.8
+
+**Fixed: leaving the cover no longer fades the page in twice.** Stepping from
+the all-tools cover into a tool used to animate the whole page in, then animate
+it in again about half a second later — which read exactly like the page
+reloading. The cause was not a second render. The transition marker on the
+shell swapped the entrance animation for a different one; removing the marker
+half a second later swapped it back, and changing the animation's name restarts
+it from the top. The entrance now keeps one animation from start to finish, so
+one tap still renders one page **and paints it once**. The smoke suite checks
+this on every build.
+
+**The sources were checked, and there are more of them.** Every headline number
+in the guides was re-checked against its source in September 2026 — Steam's
+release volume, the June Next Fest demo count, the Megabonk figures, the
+Blender 5.2 LTS release dates, the REAPER 7 feature list and the loudness
+standards all hold. Eight new sources were added to the Vault's Sources tab for
+the numbers the calculators quietly rely on: the platform's standard 30% share
+(and the 25%/20% tiers above $10M/$50M), Steam's 14-day / 2-hour refund rule,
+the $100 Steam Direct fee, the wishlist and store-page conversion benchmarks,
+the healthy refund and review ranges, and the paid-ads break-even — with the
+money assumptions labelled as the planning models they are.
+
+**Corrected: the seasonal sale rule.** The roadmap guide claimed a launch
+discount must finish 30 days before a Steam seasonal sale or you cannot take
+part. Valve exempts its big seasonal sales from the 30-day cooldown, so that
+was wrong. The roadmap guide, the marketing guide and the discount-ladder tool
+now say what actually happens.
+
+**Hardened: the storage echo guard.** The app records the exact value it is
+about to save *before* the write, so a WebView that fires the storage event
+back synchronously cannot slip past the guard and trigger a spare re-render.
+
+---
+
+## What is new in 3.2.7
+
+**No more pull-to-stretch on Android.** Dragging past the top or bottom of a
+page — or flinging into the edge — used to stretch the whole screen away from
+the system bars, because the WebView's overscroll effect treated the page like
+a photo. The shell now turns the WebView's overscroll off outright, and the
+page itself refuses the rubber band in CSS as well.
+
+**Fixed: one tap loads one page.** A navigation now renders exactly once on
+every device. Some WebViews send the same hash change twice for a single tap,
+which rebuilt the page a moment after it appeared and read as the app
+reloading; a repeated event for a page already shown is ignored, and so is a
+storage event echoing the window's own backup write. (The storage listener
+also had a wrong key name and had never actually fired — cross-window changes
+now sync properly.)
+
+---
+
+## What is new in 3.2.6
+
+**The window is the page on a PC.** The content used to stop at 1240px, which
+left the rest of a wide window as an empty paper gutter down the right-hand
+side. Above 1500px it now runs to the window edge; on smaller screens the
+column is centred instead of left-aligned.
+
+**The UI runs behind the scrollbar on a PC.** The desktop shell asks for
+floating overlay scrollbars, so the page uses the full window width and the
+bar appears over it only while scrolling — the same edge-to-edge the phone
+already gets, and only on PC.
+
+**The Android navigation strip matches the top bar.** On every page except the
+cover it now wears the top bar's surface colour and hairline instead of a
+plain paper band. The cover — the all-tools front door — stays full-bleed,
+with the UI running behind the navigation bar the way it already runs behind
+the status bar.
+
+---
+
+## What is new in 3.2.5
+
+**The page stays put behind the open sidebar.** The drawer now locks the page
+underneath it: the blurred page can no longer be dragged or scrolled while the
+menu is up, and the Android back gesture closes the drawer instead of walking
+the page backwards behind it.
+
+**The drawer is usable on a phone held sideways.** A short, wide screen turns
+the drawer into one scrolling column — every section, the stats and the New
+project button stay reachable — instead of squeezing the menu to nothing and
+pushing the footer off the screen.
+
+**The system buttons get their space.** The app already left room for the
+status bar; now the navigation buttons get the same treatment. On Android the
+safe-area insets are filled with the page colour, so content scrolls under a
+solid band rather than showing through behind the buttons, and every fixed
+bar, dialog, toast and drawer respects the left, right and bottom insets too.
+
+---
+
+## What is new in 3.2.4
+
+**Vault is on every tool's Home.** Music, 3DFoundry, 2DCanvas and Story each
+carry a **Vault** card beside Learn, Practice, Design and the Pocket timer, so
+backups, notes, reusable templates, the glossary and settings are one tap from
+the page each tool opens on.
+
+**The Pocket tools' home pages carry Practice and Vault buttons.** Each Pocket
+tool's session page now has a "Go straight there" row with **Practice** (that
+tool's finished-session log) and **Vault**, alongside the tabs that were
+already in the bar.
 
 ---
 
