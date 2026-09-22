@@ -1,5 +1,5 @@
 # SoloDev Toolbox 3.1.7
-<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
+<img width="1865" height="1041" alt="image" src="https://github.com/user-attachments/assets/d384514b-5f7e-4f32-9ca1-6eaeeafe5220" />
 
 **Plan the game. Then get better at everything it needs.**
 
