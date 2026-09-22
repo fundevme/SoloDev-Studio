@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.2.1
-<img width="2463" height="1275" alt="{C3F08D14-1A93-4311-A301-F2498D9C46AB}" src="https://github.com/user-attachments/assets/f2ebf4de-844f-464d-a95d-870940d46d70" />
+# SoloDev Toolbox 3.2.3
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,71 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.2.1-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.2.1.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.2.1-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.2.3-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.2.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.2.3-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.2.3
+
+**Fixed: zooming into a moodboard picture no longer flicks to another one.**
+A pinch recorded where its first finger landed, so letting the pinch go read
+as a swipe and threw the viewer at the next reference; a swipe now has to be a
+plain one-finger gesture that starts and ends un-zoomed. While the viewer is
+open, the Android back gesture closes the viewer instead of walking the page
+underneath backwards — the other half of the "sometimes it changes page" bug.
+
+**Design is on every tool's Home.** 2DCanvas, Music, 3DFoundry and Story each
+carry a **Design** card beside Learn, Practice and the Pocket timer, opening
+that tool's own design document and its built-in moodboard. Every card on
+every tool's Home now wears the same icon-and-two-lines shape as Studio's
+"Jump in" grid, and Studio's Home keeps that shape before the first project
+exists as well as after it.
+
+**Full screen is video-only in the viewer.** Images and audio no longer offer
+a Full screen button. Images still zoom right down to the original pixels,
+video still has its own full-screen button, and the whole-window switch in
+Vault → Settings is untouched.
+
+---
+
+## What is new in 3.2.2
+
+**Moodboards take video and audio.** The Studio moodboard and every design's
+built-in moodboard now accept videos and sound files alongside images, colours,
+gradients and notes. Files are stored exactly as they are, deduplicated by
+content, and carried by the same backups and zips as everything else. Click a
+tile and it plays right there in the viewer; audio keeps playing until you
+close the viewer, and a broken file simply shows a grey picture glyph instead
+of an error.
+
+**Videos get a still frame; audio gets an icon.** Each video is asked for one
+frame, once, which is kept and used as the tile picture with a play badge over
+it — no video decoders sitting in the grid. Audio tiles carry a speaker icon,
+the file name and a play badge.
+
+**Moodboards got fast on phones.** Tiles no longer decode a 4000px photo (or a
+whole video) to fill a 150px box: each stored file gets one small thumbnail, at
+most 800px on the long edge, made once and kept beside the original in its own
+store — never included in backups or exports, since it can always be made
+again. A board of fifty photos now paints from fifty small pictures. Tiles
+shimmer gently while their picture arrives and fade it in, and only two
+thumbnails are built at a time so a big board stays responsive. Clicking a
+tile still opens the untouched full-resolution original.
+
+**Full screen for pictures, video, and the whole app.** The viewer's **Full
+screen** button now covers images as well as video. On the desktop it uses the
+real thing; on Android, where the WebView refuses native video fullscreen, the
+player expands to fill the app instead — and the app already fills the phone
+screen. On PC, Vault → Settings gains a **Full screen** switch that puts the
+whole window full screen and remembers the choice.
 
 ---
 
