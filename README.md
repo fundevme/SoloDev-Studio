@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.3.7
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/7720f8f9-2818-4e5e-a673-fb1d2f8974a2" />
+# SoloDev Toolbox 3.3.9
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,89 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.3.7-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.3.7.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.3.7-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.3.9-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.3.9.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.3.9-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.3.9
+
+**Fixed: adding a picture to a moodboard no longer moves the page — on any
+board, including the tool design pages (3D Foundry, Music, 2DCanvas, Story)
+where it was worst.**
+
+3.3.7 put the empty-state panel below the grid and 3.3.8 moved the file picker
+to the body, but the page could still move when a picture was added on a tool
+design page. The mover was the "Ready to pin" tray: it sat inside the board
+card, above the grid, so importing a file pushed the grid and the pin button
+down by the tray's height, and pinning pulled them back up as the tray folded.
+The browser's scroll anchoring turned that into a page scroll — the board and
+everything under it ended around 190px higher than where the user was reading.
+
+The tray now floats below the card (`position: absolute`, no layout) and fades
+out on a pin instead of folding its height away. Showing it and retiring it
+change nothing: the card, the pin button, the grid and the page scroll all stay
+put, on Studio's project moodboard and on all four tool design moodboards.
+"View the whole board" and "Clear moodboard" moved out of the controls' button
+row to below the grid, where they appear at the first pin without wrapping the
+row onto a second line on a phone (which had pushed the grid down).
+
+The last mover was focus, and it was invisible to every geometry test because a
+programmatic click never focuses anything. A real click focuses the button it
+lands on — "Choose from this device" on the import, "+ Pin to board" on the pin
+— and rebuilding the board's controls removed that focused element from the
+DOM. The browser scrolls the page when focus has to fall back, once per
+rebuild: that is why the page moved on the import *and* again on the pin. The
+board now drops focus from anything inside it before it rebuilds, and the smoke
+tests click the real way (focus first), so the whole flow is measured with a
+focused button.
+
+- The board switches the browser's scroll anchoring off for its own repaints
+  and keeps holding its own anchor (`App.keepScroll`; the empty panel still
+  leaves after the grid has painted), so the page cannot be scrolled by the
+  browser to "compensate" for a pin.
+- `PIN_STABLE` now requires the import itself to move nothing — card, card
+  height, pin button, grid, scroll — and `FIRST_PIN` runs Studio's board and
+  all four tool design boards, checking the geometry at the import, the instant
+  the empty state leaves, and once the tray is gone.
+
+---
+
+## What is new in 3.3.8
+
+**Fixed properly: the page could scroll up when you added a picture — most
+often on the tool moodboards (Music, 3DFoundry, 2DCanvas, Story), which is why
+Studio's board looked fine.**
+
+Every board's "Choose from this device" button clicks an invisible file input
+kept just outside the screen. That input was `position: fixed` *inside the
+page* — but a fixed element is positioned against the nearest ancestor that
+has a transform, and every page section keeps an identity transform after its
+entrance animation. So the "off-screen" input was really sitting at the
+top-left corner of whichever section contained it. When the WebView focused it
+(tapping the button, or coming back from the picker) the page scrolled to that
+spot. On a tool's design page the board is the section, so the board came up
+under you; on Studio the section sits higher up the page, so the page could
+jump to the top. It also depended on how far down you had scrolled.
+
+All moodboards are one shared component (`App.moodBoard`) — Studio's project
+moodboard and the built-in board of every design in every tool — and they now
+share one file input attached to the document body, where `position: fixed`
+really is the viewport corner. Focusing it cannot move the page, and the
+2DCanvas value checker uses the same input. Together with 3.3.7's empty-state
+fix, adding the first picture to any board leaves the card, the pin button and
+the page scroll exactly where they were.
+
+The smoke suite's new `PICKER_INPUT` check builds a fresh board on Studio and
+on a tool design page, and fails if the picker input is inside the page, is not
+at the viewport corner, or scrolls the page when it is focused.
 
 ---
 
