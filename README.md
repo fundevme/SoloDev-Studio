@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.3.9
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/c8a5550c-65d1-4287-98a5-c7108ece91e0" />
+# SoloDev Toolbox 3.4.0
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,10 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. 
-
-**Note if you want to look at the source code please download the latest source code in the releases the current github repository is out of date.**
-
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -19,15 +16,55 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.3.9-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.3.9.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.3.9-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.0-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.0-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.0
+
+**Fixed: ticking a "done" control no longer reloads the page, and adding a card
+to a card tool no longer makes the page jump.**
+
+The exercise "Mark done" buttons on every tool's lesson pages (Music, 3D
+Foundry, 2D Canvas, Story) re-rendered the whole page when they were clicked.
+A route render replays the page entrance animation and rebuilds the screen, so
+ticking one exercise read as the app reloading — and the recreation could move
+the page scroll with it. The button now toggles in place: the card takes its
+done styling, the label switches to "Done ✓" and the lesson-menu dot updates,
+with no re-render and no scroll. The same in-place treatment went to the other
+done controls that shared the bug: the marketing campaign's checklist items and
+"Mark this phase finished", the content calendar's posted ticks, the Plan
+milestones, and Home's "Do next" task checkbox (which also refreshes the
+"Tasks done" meter beside it).
+
+The card tools — Music's song map, 3D Foundry's sprint week, Story's scene
+cards — rebuilt their whole card on every action (`App.clear(card)` and start
+again). Adding the first card on a blank page emptied the card for a moment,
+which makes the page shorter and lets the browser clamp the scroll, and it
+removed the button the user had just clicked, which makes the browser scroll as
+focus falls back. The card, the list host and the add form are now built once
+and the parts that change are painted in place: the count, the graph, the strip
+and the rows. Adding a card cannot move the page, and no route render is
+involved.
+
+Home's "Idea parking lot" no longer reloads the page either: parking, finishing
+or deleting an idea repaints the badge and the list in place.
+
+- The lesson menu's completion dot updates with the exercise that just changed,
+  instead of waiting for the next navigation.
+- A real click focuses the button it lands on; every one of these in-place
+  repaints drops that focus before it removes the element, so the page cannot
+  be scrolled by focus falling back.
+- `INPLACE` in the smoke suite pins the whole set down: each tick and each add
+  must not call `App.renderRoute` and must not scroll the page up.
 
 ---
 
