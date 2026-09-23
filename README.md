@@ -1,5 +1,5 @@
 # SoloDev Toolbox 3.4.9
-<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
+<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/7f3e8763-f8f9-4561-b34b-e0ceabda67d8" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android.
+No accounts, no ads, no telemetry. Available on Windows and Android. Download the app and source code on the releases page.
 
 ---
 
