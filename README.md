@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.9
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/7f3e8763-f8f9-4561-b34b-e0ceabda67d8" />
+# SoloDev Toolbox 3.4.11
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Download the app and source code on the releases page.
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -16,15 +16,32 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Download th
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.9-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.9.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.9-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.11-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.11.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.11-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.11
+
+**Fixed: back on the cover does nothing.** On Android the system back button —
+hardware or gesture — on the cover used to fall through to Studio's home (or
+to whatever page was last visited), so it read as "back took me to SoloDev
+Studio". The cover is the front door: back there is ignored. It does not
+navigate and it does not leave the app, however you arrived at the cover.
+Everywhere else back behaves as before: it closes the top layer (a dialog, the
+image viewer or the drawer) and otherwise walks the app's own history. The
+Windows shell has no back button to intercept, and a browser's own back stays
+the browser's.
+
+- The web app changed (`app.js`, `views-vault.js`); the APK (versionCode 73)
+  and the EXE are rebuilt with it.
 
 ---
 
