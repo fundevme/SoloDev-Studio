@@ -7,9 +7,9 @@ Five tools for one person, all offline and all on your own device: **Studio**
 for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
+**Download the latest release and source code on the release page.**
 
 No accounts, no ads, no telemetry. Available on Windows and Android.
-Download the latest release and source code on the release page.
 ---
 
 ## What's here
