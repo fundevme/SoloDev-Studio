@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.4
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/4c083bed-82de-4420-86b1-ddd0a0456de9" />
+# SoloDev Toolbox 3.4.5
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -10,22 +10,40 @@ plus **Pocket** versions of each for finishing something in a single day.
 
 No accounts, no ads, no telemetry. Available on Windows and Android.
 
-
-**Download the latest release and source code on the release page. No accounts, no ads, no telemetry. Available on Windows and Android.**
+---
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.4-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.4.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.4-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.5-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.5.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.5-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.5
+
+**Fixed: the Android navigation bar is no longer greyed out.**
+
+Since Android 15 the app is drawn edge-to-edge, so the system navigation bar
+floats over the page. With 3-button navigation the system also enforces
+navigation-bar contrast by default, laying a translucent dark scrim over
+whatever the app paints in that strip — so the surface colour and hairline the
+app has drawn there since 3.2.6 (the same treatment the top bar gives the
+status bar) read as a grey band instead. The app is styling that area itself,
+so it now tells the system not to: `MainActivity` calls
+`Window.setNavigationBarContrastEnforced(false)` on Android 10 and up. The
+strip keeps the app's own surface colour and hairline, and on the cover the UI
+stays full-bleed behind the navigation buttons the way it already does behind
+the status bar. This is a native change — the APK had to be rebuilt
+(versionCode 67); the web app is unchanged apart from the version number.
 
 ---
 
