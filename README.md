@@ -9,8 +9,8 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 plus **Pocket** versions of each for finishing something in a single day.
 
 
-**Download the latest release and source code on the release page. 
-No accounts, no ads, no telemetry. Available on Windows and Android.**
+**Download the latest release and source code on the release page.**
+**No accounts, no ads, no telemetry. Available on Windows and Android.**
 
 
 ## What's here
