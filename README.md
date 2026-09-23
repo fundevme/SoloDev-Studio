@@ -1,5 +1,5 @@
 # SoloDev Toolbox 3.4.1
-<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
+<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/7fb1184b-4f02-431e-9251-4798eb15aa64" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -10,6 +10,7 @@ plus **Pocket** versions of each for finishing something in a single day.
 
 No accounts, no ads, no telemetry. Available on Windows and Android.
 
+**Note if you want to look at the source code please download the latest source code in the releases the current github repository is out of date.**
 ---
 
 ## What's here
