@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.6
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/8365bbc6-bad4-4054-b802-a2b3aca9a5c0" />
+# SoloDev Toolbox 3.4.9
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Downlooad current apk and exe and source code on the releases page. 
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -16,15 +16,112 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Downlooad c
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.6-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.6.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.6-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.9-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.9.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.9-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.9
+
+**Fixed: the "Start working" button no longer draws a focus ring when it
+appears.** The loading screen focused the button as it revealed it, so the
+browser drew its keyboard focus ring around the button against the splash.
+The button is simply shown now, unfocused; Tab still reaches it and shows the
+ring the way a keyboard ring should.
+
+- The web app changed (`core.js`, `views-vault.js`); the APK (versionCode 71)
+  and the EXE are rebuilt with it.
+
+---
+
+## What is new in 3.4.8
+
+**The app waits for you, notes stay above the phone's navigation bar, and a
+pinned note or caption can be edited.**
+
+### The loading screen hands over
+
+The first page ends on "Ready." now, not on a timer. When boot finishes — the
+store open, the projects loaded, the workspace built, the images checked, the
+fonts in — the progress bar fills to 100% and a **Start working** button
+appears. The app does not drop into the workspace by itself any more: you
+press the button, and only then does the cover open. A stuck boot step still
+cannot trap you: a safety timer frees the button even if a step never reports,
+and the screen scrolls on a short viewport so the button is always reachable.
+
+### Notes clear the navigation bar on Android
+
+Opening a long moodboard note on a phone put the bottom of the panel behind
+the Android navigation bar, where the last lines could not be reached. The
+viewer now reserves the navigation-bar inset inside its body (the app's own
+edge-to-edge strip sits behind the bar, and the viewer is drawn over it), so
+the note panel, video controls and everything else stop above the system
+buttons. The viewer keeps its full-bleed background — only the content is
+lifted — and video full screen still takes the whole window.
+
+### Pinned notes and captions are editable
+
+Every pin on a moodboard now carries a ✎ beside its move and remove buttons.
+A note opens a dialog with its whole text in a textarea plus its caption; any
+other pin (picture, video, colour, gradient, link) opens the caption alone.
+Saving repaints the board in place — no page reload, the scroll stays put.
+The full-screen viewer carries an **Edit** button for the pin it is showing,
+and the dialog opens above the viewer, so a note can be fixed while you are
+reading it: the open note and its caption update with the save.
+
+- The web app changed (`index.html`, `app.js`, `core.js`, `app.css`,
+  `views-vault.js`); the APK (versionCode 70) and the EXE are rebuilt with it.
+
+---
+
+## What is new in 3.4.7
+
+**Long moodboard notes stay on screen and scroll, the first page is a real
+loading screen, and the sidebar drawer no longer flickers.**
+
+### Notes
+
+A moodboard note can be any length now. The note field is a textarea, so a
+note can run across lines; on the board a long one is clamped to its first few
+lines with an ellipsis instead of being centred and sliced off at the tile
+edges; and opening it shows the whole thing in the full-screen viewer, where
+the panel is capped to the height that is really there. The rest of the note
+is read by scrolling up and down inside that panel — it never hangs off the
+bottom of the screen again, on the EXE or the APK, however long the note is or
+however the phone is turned. `NOTE_SCROLL` in smoke guards the tile clamp, the
+panel fit and the scroll.
+
+### Loading screen
+
+The splash page is an actual loading screen now. Boot reports its real steps
+into it — opening your data, loading your projects, building the workspace,
+checking your files, waiting for the fonts — and it leaves by itself once the
+app is ready. There is nothing to press; the "Skip it on launch" switch and
+the "Show the intro again" button are gone, because a loading screen cannot be
+skipped. A minimum show time keeps the steps readable and a safety timer
+releases the screen if a step ever hangs, so it can never trap anyone. It
+still scrolls on a short viewport (a phone in landscape, a laptop at 150%
+display scaling), keeping the status line and the progress bar reachable.
+
+### Sidebar drawer
+
+The drawer is a solid surface while it is a drawer. It was translucent with a
+backdrop blur, and a blurred layer that is moving is resampled every frame —
+on a phone GPU the blur arrives a frame late and the drawer flashes as it
+slides in (the top bar and tab bar already drop their blur for exactly this
+reason). Closing now fades the dim layer out with the drawer instead of
+removing it in one frame, so the page no longer snaps bright while the drawer
+is still moving.
+
+- The web app changed (`index.html`, `app.js`, `core.js`, `views-vault.js`,
+  `app.css`); the APK (versionCode 69) and the EXE are rebuilt with it.
 
 ---
 
