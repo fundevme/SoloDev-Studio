@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.0
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/85a78953-2598-49c6-9e8a-92438b983881" />
+# SoloDev Toolbox 3.4.1
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -10,23 +10,36 @@ plus **Pocket** versions of each for finishing something in a single day.
 
 No accounts, no ads, no telemetry. Available on Windows and Android.
 
-**Note if you want to look at the source code please download the latest source code in the releases the current github repository is out of date.**
-
 ---
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.0-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.0-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.1-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.1.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.1-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.1
+
+**Fixed: the Vault is the same vault in every tool. Templates and the glossary
+are no longer missing outside Studio.**
+
+Only Studio's vault carried the Templates and Glossary tabs; opening the Vault
+from Music, 3DFoundry, 2DCanvas, Story or any Pocket tool showed just Backups,
+Notes, Sources and Settings — even though those tools' own Home cards describe
+the vault as holding "reusable templates, a glossary and settings". Every tool
+now shows the full set — Backups, Notes, Templates, Glossary, Sources and
+Settings — with the same content as Studio's, and the "planning templates and
+the glossary stay in Studio" note is gone with the missing tabs.
 
 ---
 
