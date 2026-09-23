@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.3.3
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/61580639-d9d5-4735-8f24-691559d0775b" />
+# SoloDev Toolbox 3.3.7
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -16,15 +16,150 @@ No accounts, no ads, no telemetry. Available on Windows and Android.
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.3.3-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.3.3.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.3.3-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.3.7-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.3.7.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.3.7-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.3.7
+
+**Fixed: the page no longer jumps when the first picture lands on a new
+moodboard.** On an empty board the empty-state panel ("The board is empty…")
+used to sit between the board's controls and the picture grid. Pinning the
+first picture removed that panel, which pulled the grid — and everything below
+it — up the height of the panel, and on a page scrolled down it could clamp the
+page scroll, so the page scrolled up under you. It only happened on the first
+pin, because after that the empty panel was already gone.
+
+The panel now lives in the board's content slot, *below* the grid, so the
+grid's place never changes when the first pin arrives: the tile appears where
+the panel was and the panel drops out beneath it.
+
+- The board card, the pin button and the grid return to their exact
+  pre-import positions, and the page scroll does not change.
+- The same fix covers every moodboard in the app — Studio's project moodboard
+  and the built-in moodboard of every design in Music, 3DFoundry, 2DCanvas and
+  Story — because they are one shared component.
+
+The smoke suite's new `FIRST_PIN` check pins the first picture on a brand-new
+board (Studio's and a design's) and fails if the grid moves the instant the
+empty state leaves, if the page scroll changes, or if the card, pin button and
+grid do not return to their pre-import places.
+
+---
+
+## What is new in 3.3.6
+
+**The import tray now clears itself, and every board has a clear button.**
+
+- **Previews clear the instant you pin.** The "pending" row folds away the
+  moment the pin lands — no tick, no wait period — so the next import always
+  starts from an empty tray. The fold is a short animation, not a snap, and
+  the page never scrolls: the board card ends exactly the size it was before
+  the import, with the new pin sitting on the board.
+- **Clear previews.** A small link in the tray empties it on demand. Files
+  that were never pinned are removed from the device with their preview;
+  pinned ones are already on the board and are kept.
+- **Clear moodboard.** Every board now has a **Clear moodboard** button beside
+  "+ Pin to board" (hidden while the board is empty). It asks first, then takes
+  every pin off — pictures, colours, gradients and notes. A stored picture is
+  only deleted when no other board is using it, so anything shared is kept, and
+  the empty state comes back.
+
+Both buttons are on every moodboard in the app, because the boards are one
+shared component.
+
+The smoke suite's `PIN_STABLE` check now asserts the preview is gone within
+the fold, that no tick appears, that the page never scrolls, and that the card
+and pin button return to their pre-import positions; a new `BOARD_CLEAR` check
+imports, pins, clears the previews, clears the board, and fails if a file is
+deleted while still pinned elsewhere, kept when it should be released, or if
+either button re-renders the route.
+
+---
+
+## What is new in 3.3.5
+
+**Fixed: pinning a picture still moved the board.** A file waiting to be pinned
+sat in a "pending" row in the board's controls; pinning it removed that row, so
+everything below — the button, the board, the tiles — shifted up by its
+height. The previous fix tried to hold the board still by scrolling the page,
+which moved the page instead. The preview now **stays in the tray, marked
+pinned** (dimmed thumbnail, green tick, accent border), so pinning changes
+nothing above the grid:
+
+- The card keeps its exact height, the pin button does not move, and the page
+  never scrolls. The pinned tile simply appears on the board.
+- The tray is replaced the next time you choose files, so it never fills up.
+- The tick's ✕ removes only the receipt — the file is on the board now —
+  and removing the tile removes its receipt too.
+
+Checked on every page with a moodboard — Studio's project moodboard and the
+built-in moodboard of Music, 3DFoundry, 2DCanvas and Story designs: after
+pinning an imported picture, the card position, card height, pin button and
+page scroll are all **0px** away from where they were (the board used to move
+154px).
+
+The smoke suite's new `PIN_STABLE` check imports a file, pins it, and fails if
+the card, the pin button, the preview chip or the scroll moves at all, if the
+preview loses its pinned mark, or if the next import does not replace the tray.
+
+---
+
+## What is new in 3.3.4
+
+**Fixed: the UI reloaded when you pinned something, the boards were not all the
+same, and pinning an imported picture slid the board up.** Pinning on the
+Studio moodboard called a full page render — the page entrance and every tile
+replayed, and the page jumped. Importing and pinning now paint the board in
+place, on every moodboard in the app:
+
+- **One board, used everywhere.** The project moodboard in Studio and the
+  built-in moodboard of every design in every tool (Music, 3DFoundry,
+  2DCanvas, Story) are now the same component (`App.moodBoard` in core.js), so
+  they cannot drift apart. Every board carries the same tools: **Media /
+  Colour / Gradient / Note**, a media file or a pasted link, a caption,
+  **+ Pin to board**, **View the whole board**, **Pin from another board**,
+  moving with the **‹ ›** arrows or by dragging, the shared badge, and remove.
+  Before this, a tool design moodboard only had images and colours.
+- **Nothing reloads.** Importing files, pasting a link, pinning a colour,
+  gradient or note, linking from another board, moving and removing all
+  repaint only that board — the page entrance does not replay, the tile pop-in
+  does not restart, and the page keeps its place. The counts, the size badge
+  and the "stored at full size" line update with it.
+- **Colours, gradients and notes move between boards too.** "Pin from another
+  board" used to offer only files. It now lists every pin — and a board that
+  holds nothing but drawn material appears in the picker as well. Drawn
+  material shows as itself (a swatch, a gradient, a note), and because it has
+  no file behind it, it is copied onto the board asking rather than linked.
+  Files are still linked, never copied, and still refuse to appear twice on
+  one board; drawn material repeats legitimately.
+- **Fixed: pinning an imported picture slid the board up.** A file waiting to
+  be pinned sits in a "pending" row above the board; pinning it removed that
+  row, and everything below — the board and the buttons — jumped up by its
+  height (only visible with a file, which is why it was hard to reproduce).
+  In-place repaints now hold an anchor element steady instead of forcing the
+  old scroll offset back, so the board stays exactly where it is and the page
+  only moves to compensate. Checked on every moodboard page: Studio and all
+  four tools hold the board to within a pixel.
+- **Take the pictures off** now updates the board in place too (the button
+  appears and disappears with the media pins instead of waiting for a page
+  render).
+
+The smoke suite's `BOARD_MOVE` check now also pins a colour on both board
+kinds and fails if a pin re-renders the route, tears out or rebuilds the board
+grid, or fails to paint the new tile in place; a new `PICKER_DRAWN` check
+copies a colour, a gradient and a note from one board to another and fails if a
+board of drawn material is not offered, is drawn as a broken picture, loses its
+value or caption, or re-renders the route. The verify suite pins a colour
+through the new board controls on every tool's design page.
 
 ---
 
