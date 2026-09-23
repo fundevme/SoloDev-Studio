@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.5
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/e4d2a592-1e43-4565-8b69-e72960d8f705" />
+# SoloDev Toolbox 3.4.6
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,22 +8,61 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-**Download the latest release and source code on the release page. No accounts, no ads, no telemetry. Available on Windows and Android.**
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
+---
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.5-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.5.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.5-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.6-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.6.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.6-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.6
+
+**Fixed: the status and navigation bars follow the app's own theme, and the
+edge-to-edge clearances are live again.**
+
+The app always draws from its own theme — the light Field notes and Linen, or
+the dark Greenhouse — whichever way the phone's system dark mode is set. The
+icons on the Android status and navigation bars are drawn by the system,
+though, and they were following the *system* setting: on a dark-mode phone the
+clock, battery and navigation buttons turned white over the app's light pages
+(and the other way around on a light-mode phone running Greenhouse). The
+Android shell is now always light — the activity themes are based on
+`Theme.AppCompat.Light`, with the light-bar items set for the first frames —
+and a new native plugin, **SoloDevBars**, is told what the app is actually
+showing. The page reports its theme (and the near-black image viewer) and the
+plugin sets the bar icons to suit, plus the surface colour the system paints
+the bars with on Android versions that draw them outside the WebView. The web
+app asks on every theme change, so following the app's theme always wins.
+
+On top of that, one of the edge-to-edge clearances never applied: the class
+that switches on the taller top bar, the drawer's status-bar padding and the
+splash and modal insets was set from the Android version in the user agent —
+and this WebView reports "Android 10" forever, so on Android 15+ none of it
+was live. The shell now measures the real safe-area insets (the property that
+actually says whether the app is drawn under the bars, whatever the version)
+and re-measures on rotation.
+
+- `SystemBarsPlugin.java` in the Android project; the theme hook is
+  `App.paintSystemBars` in `core.js`, called on every `App.setTheme` and when
+  the image viewer opens or closes.
+- `styles.xml` uses the Light parents; the `html.e2e` class in `app.js` is now
+  set from a real safe-area probe, not the frozen user agent.
+- Native change for the bar icons and the APK's launch theme — the APK had to
+  be rebuilt (versionCode 68). The EXE is rebuilt for the web-app change (the
+  probe is a no-op on the desktop).
 
 ---
 
