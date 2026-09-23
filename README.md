@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.2
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/a7001a50-6656-4809-b3e8-0d7274991c3e" />
+# SoloDev Toolbox 3.4.4
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,24 +8,72 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
-**Download the latest release and source code on the release page.**
-**No accounts, no ads, no telemetry. Available on Windows and Android.**
-
+---
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.2-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.2.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.2-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.4-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.4.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.4-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.4
+
+**Fixed: removing a past session updates the whole practice page, not just the
+report.**
+
+3.4.3's "− Remove a past session" repainted the report in place — and only the
+report. The "This week, by tool" gauges above it and the two weekly target
+cards (their meters and their "N minutes in the last 7 days" line) kept the
+removed session's minutes until the next navigation, so the page could show
+"0 sessions" in the report and 30 minutes in the gauges at the same time.
+Every practice card now builds once, keeps its number nodes and registers a
+repaint with the page, and adding or removing a session — or editing a weekly
+target — repaints the whole set in place. The page still never re-renders the
+route, so the entrance never replays and the scroll stays put.
+
+- `REPORT_REMOVE` in the smoke suite now also pins the gauges and the
+  every-tool target to the same numbers as the report, before and after a
+  removal, and checks that editing a target repaints the gauges in place.
+
+---
+
+## What is new in 3.4.3
+
+**The practice report can remove a hand-added session, and every tool in it
+links to its own pages.**
+
+"+ Add a past session" has always lived on the practice report; there was no
+way to take one back without hunting through the tool's own log. The report now
+carries **− Remove a past session** beside it. It lists the hand-added sessions
+across every Pocket tool, newest first — each with its tool, date, minutes and
+project — and removing one takes its minutes out of the report's totals at
+once. Finished timer sessions still live in their tool's log and are deleted
+there, which is where they were created; the dialog says so when it is empty.
+
+Every tool row in the report's "By tool — this week" split now carries two
+links: **Session page →** to that tool's Pocket session page and **Practice →**
+to its practice page (Studio's opens Studio's Practice page). The same two
+links sit on every row of the remove dialog, so a session can be opened and
+checked before it goes. The report's add and remove both repaint the card in
+place — the route is never re-rendered and the page entrance never replays —
+and a link closes the dialog before it navigates.
+
+- `REPORT_REMOVE` in the smoke suite pins it down: the report must show the
+  remove button and both links; the dialog must list hand-added sessions only
+  (a finished timer session must not appear); removing one must repaint the
+  report in place with no `renderRoute` and leave other tools' sessions alone.
 
 ---
 
