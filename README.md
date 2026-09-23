@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.1
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/7fb1184b-4f02-431e-9251-4798eb15aa64" />
+# SoloDev Toolbox 3.4.2
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -10,22 +10,52 @@ plus **Pocket** versions of each for finishing something in a single day.
 
 No accounts, no ads, no telemetry. Available on Windows and Android.
 
-**Note if you want to look at the source code please download the latest source code in the releases the current github repository is out of date.**
 ---
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.1-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.1.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.1-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.2-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.2.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.2-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.4.2
+
+**Fixed: switching a Vault tab no longer moves the page, and the tool clocks
+stop jumping.**
+
+Every Vault tab — Backups, Notes, Templates, Glossary, Sources, Settings, in
+every tool's vault — re-rendered the whole page when it was tapped. Clearing
+the page for a moment made the browser clamp the scroll, and the vault came
+back moved: the title was up off-screen and the page was somewhere it had not
+been chosen to be. The page head and the tab row now stay in place and only
+the tab body is swapped in, built detached so the document is never
+momentarily short. The other Vault actions that touched the page — saving or
+deleting a note, picking a theme, deleting the stored files, finishing an
+import — repaint what they changed instead of re-rendering the route, so none
+of them can move the scroll either.
+
+The four tool clocks (2DCanvas's Studio clock, and the Sprint clocks on 3D
+Foundry, Music and Story) had the same problem in a smaller place: the card
+was emptied and rebuilt on every Start / Pause / Next phase / Reset tap, and
+replaced altogether when a phase ended. Each card is now built once and
+painted in place, exactly like the 15-minute drill (which was already fixed):
+a tap cannot drop the button out from under the finger, a phase change cannot
+move the page, and the counting keeps going in the same card.
+
+- `VAULT_CLOCKS` in the smoke suite pins it down: switching any vault tab,
+  deleting a note and tapping any clock must not call `App.renderRoute` and
+  must not scroll the page up, and the same clock card element must survive
+  every repaint.
 
 ---
 
