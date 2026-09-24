@@ -1,4 +1,4 @@
-# SoloDev Toolbox 3.4.12
+# SoloDev Toolbox 3.4.11
 <img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/88467946-7cc7-4d6c-a443-5ab38534cb4f" />
 
 **Plan the game. Then get better at everything it needs.**
@@ -16,42 +16,15 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Download th
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.12-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.12.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.12-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.4.11-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.4.11.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.4.11-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
-
----
-
-## What is new in 3.4.12
-
-**Video full screen hides the Android system bars, and the shell no longer
-draws them over the player.** Full screen on a phone is the app's own — the
-WebView hands native video full screen straight back — so the status
-("notification") bar and the navigation bar stayed on screen and were painted
-over the bottom of the player, covering its own controls. While the video fills
-the window the app now tells the shell to hide both bars
-(`SystemBarsPlugin.setImmersive`), with the transient behavior: a swipe from an
-edge still brings them back over the video, and they slide away again. Leaving
-full screen — the **Exit full screen** button, Esc, or Android's back, which
-now leaves full screen *before* it closes the viewer — restores the bars at
-once, and so does closing the viewer itself. Coming back to the app from the
-recents screen while still in full screen re-hides them, and a fresh launch can
-never come up with them stuck hidden. `VIEWER_BARS` in smoke guards the round
-trip; verify checks the shell calls on the button and on Escape.
-
-**Also fixed: a video tile whose stored still frame fails to load no longer
-stacks two play badges** on top of each other — the grey fallback keeps a
-single one.
-
-- The native shell changed (`SystemBarsPlugin.java`); the web app changed
-  (`app.js`, `core.js`). The APK (versionCode 74) and the EXE are rebuilt with
-  it.
 
 ---
 
