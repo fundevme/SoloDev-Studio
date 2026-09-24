@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.4.11
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/88467946-7cc7-4d6c-a443-5ab38534cb4f" />
+# SoloDev Toolbox 3.5.0
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Download the latest release and source files on the releases page.
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -16,15 +16,77 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Download th
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.4.11-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.4.11.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.4.11-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.5.0-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.5.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.5.0-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.5.0
+
+**Big backups no longer crash the app, video full screen owns the phone's
+bars, and the sidebar slides without stutter.**
+
+### Big backups are streamed, not stuffed
+
+"Save everything (.zip)" and "Export all files (.zip)" used to read every
+stored file into memory, hold them all at once while assembling the archive,
+and then hand the finished zip to the phone or the Windows shell as one base64
+string — at a few hundred megabytes that is several full copies of the archive
+and the app was killed. Now:
+
+- The zip is built from the stored files as Blobs, with each file's checksum
+  computed in 4MB chunks; the file bytes never enter the JS heap.
+- The finished zip is written in chunks: the Android app opens the system file
+  picker once and then streams the archive to the chosen file in 2MB chunks,
+  and the Windows shell streams it through IPC into an open write stream.
+  Memory stays flat however big the backup is.
+- Restoring reads the archive's table of contents and slices each stored file
+  out of it on demand, so a 350MB backup is never held in memory whole. A
+  64-bit zip, a damaged archive or a backup over 4GB is refused with a clear
+  message instead of failing halfway.
+- The two `.json` files still travel inside every "Save everything" zip —
+  `backup.json` (the written data) and `manifest.json` (the file table) — and
+  the regression suite now parses both out of the archive.
+- Also fixed: `Import files (.zip)` now says to use `Restore everything (.zip)`
+  when handed a full backup (and the full restore still refuses an
+  images-only zip). Save and restore dialogs stay up while the file is being
+  written, so a large backup no longer looks finished before it is.
+
+### Video full screen on Android
+
+- The status and navigation bars are hidden while a video is in full screen,
+  portrait or landscape; a swipe from an edge brings them back over the video
+  and they slide away again. The activity re-hides them itself when it regains
+  focus or rotates, and the page re-asserts on resume — Android hands the bars
+  back at those moments on its own.
+- The Android app no longer asks the WebView for native video full screen at
+  all: Capacitor cancels the custom view, and the attempt is what flashed the
+  screen white. If a WebView still reports a native fullscreen (the video's own
+  control), the viewer pulls it straight back into the app's full screen, where
+  the bars can actually be hidden.
+- Held sideways the navigation bar is a column down one edge; the viewer now
+  reserves the side insets as well as the bottom one, so the player's own
+  controls and the viewer's buttons no longer sit under it.
+- Android's back leaves full screen first and only then closes the viewer.
+
+### The sidebar
+
+- The drawer's full-screen dim layer no longer carries a backdrop blur (a
+  moving blur is resampled every frame and stutters on a phone GPU — the same
+  reason the drawer itself has been solid since 3.4.7), and the drawer is
+  promoted to its own compositor layer so its slide is a transform only.
+
+- The web app changed (`app.js`, `core.js`, `app.css`, `views-vault.js`), and
+  so did the shells: `MainActivity.java`, `SystemBarsPlugin.java`,
+  `SavePlugin.java`, `desktop-src/main.js` and `desktop-src/preload.js`. The
+  APK (versionCode 75) and the EXE are rebuilt with them.
 
 ---
 
