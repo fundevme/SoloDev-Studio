@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.6.17
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/38f8bc85-a5f3-4515-8647-761cb22653e4" />
+# SoloDev Toolbox 3.6.18
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Get the latest release and source code on the releases tab
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -16,15 +16,60 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Get the lat
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.6.17-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.6.17.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.6.17-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.6.18-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.6.18.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.6.18-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.6.18
+
+**Moodboard thumbnails load faster on PC, and a video on the PC takes the whole
+screen instead of playing inside the window.**
+
+### PC thumbnails use the whole machine
+
+The thumbnail tune was written for a phone: three decode lanes at a time, a
+180-picture cache, and a background warm that deliberately skipped big imports
+because a phone decoder is small and shared with the rest of the system. On a
+PC that just made a full board crawl through its first screen. The desktop
+shell now runs six lanes, keeps a 600-picture thumbnail cache, asks for tiles a
+screen ahead of the viewport instead of half a screen, and warms the copies of
+a big import in the background — strictly behind the tiles the reader is asking
+for, so nothing visible waits on them. A phone keeps the old, conservative
+numbers: the recipe, the queues, the hot-job priority and the viewport observer
+are the same everywhere.
+
+### A video takes the PC screen
+
+On the desktop the app's full screen used to stay inside the window: a video
+played with the title bar and the taskbar still around it, and "full screen"
+only stretched the player inside that window. Opening a video now takes the
+real PC screen, and leaving it puts the window back exactly the way it was
+found:
+
+- windowed before the video → windowed again, on the pin that was opened;
+- already full screen (the Settings switch, F11) → still full screen, on the
+  same pin.
+
+The temporary full screen is not the "open in full screen" preference: the
+shell's report of a change the viewer asked for is not written down, so a video
+never flips the setting on or off by itself. Leaving full screen also restores
+the reader's tile against the reflowed page once the window has come back to
+its windowed size, so exiting lands on the moodboard where it started.
+
+### Smaller fixes
+
+- New smoke check `VIEWER_WINDOW_FS` covers the window handover (windowed →
+  full screen → windowed, already-full-screen stays, preference untouched).
+- The web app changed (`core.js`, `app.js`); the APK (versionCode 94) and the
+  EXE are rebuilt.
 
 ---
 
