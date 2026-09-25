@@ -1,5 +1,5 @@
-# SoloDev Toolbox 3.5.0
-<img width="2463" height="1275" alt="656543751-f2ebf4de-844f-464d-a95d-870940d46d70" src="https://github.com/user-attachments/assets/22126add-fae4-4e32-b7b9-269fe01d69d0" />
+# SoloDev Toolbox 3.6.17
+<img width="1274" height="1050" alt="{8BE7BB76-5FB8-4CF2-9469-8310FF1F0785}" src="https://github.com/user-attachments/assets/cf4d6cd0-68c7-4570-8b46-b2ad01d06263" />
 
 **Plan the game. Then get better at everything it needs.**
 
@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Download latest release and source in the releases page
+No accounts, no ads, no telemetry. Available on Windows and Android.
 
 ---
 
@@ -16,15 +16,846 @@ No accounts, no ads, no telemetry. Available on Windows and Android. Download la
 
 | File | What it is |
 | --- | --- |
-| `SoloDevToolbox-3.5.0-portable.exe` | Windows app. No install — double-click to run. |
-| `SoloDevToolbox-3.5.0.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
-| `SoloDevToolbox-3.5.0-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
+| `SoloDevToolbox-3.6.17-portable.exe` | Windows app. No install — double-click to run. |
+| `SoloDevToolbox-3.6.17.apk` | Android app. Sideload it (you will need to allow "Install unknown apps"). |
+| `SoloDevToolbox-3.6.17-source.zip` | The full source for this release: the web app, the Electron wrapper and the Android project. No `node_modules`, build output or binaries. |
 | `app/` | The full web app source. It also runs in any browser — just open `app/index.html`. |
 | `app/assets/brand/` | The editable SVG logos: the Toolbox app icon plus each module mark. |
 | `desktop-src/` | Electron wrapper source. Rebuild the EXE from here. |
 | `desktop-src/tools/export-icons.js` | Regenerates every icon file from the SVGs. |
 | `mobile-src/` | Capacitor Android project. Rebuild the APK from here (the signing key is included). |
 | `README.md` | This file. |
+
+---
+
+## What is new in 3.6.17
+
+**Turning the phone keeps you on the tile you were reading, and a board that a
+surface change left blank loads itself again.**
+
+### A turn keeps your tile
+
+A rotation reflows a moodboard: the column count changes with the width and the
+page's height with it. On a phone the landscape page is much shorter than the
+portrait one, so the browser clamps the scroll to the shorter document — the
+reader ended up at the bottom of the page with the tile they were looking at
+nowhere in sight: "the app loses where the previous tile was and scrolls down
+to the bottom of the page". The page now remembers the tile crossing a focus
+line a third of the way down the viewport as you scroll (the same idea the
+viewer has used for its own tile since 3.6.15), and a turn with no viewer open
+puts it back at the same fraction of the new viewport, instantly and with no
+route render. The board, the grid and the scroll are the only things touched.
+
+### A blank tile comes back
+
+Two ways a tile picture could stay blank are now repaired. A rotation or a trip
+to the background can drop a board's decoded frames; the decode wait now treats
+a decode the WebView refuses as a picture to remake — the tile asks the store
+for a fresh URL and draws it, under whatever layer is covering the board, so
+the reveal is never a blank tile. And a thumbnail generation that never answers
+(a codec that hangs on a damaged file, a store read that never completes) no
+longer holds its queue lane forever: with three stalled lanes every thumbnail
+in the app stopped being made, which is exactly "the app is not loading tiles".
+The stalled job answers the waiting tile instead and the lane is freed.
+
+### Smaller fixes
+
+- The reader's-place anchor (`App.restorePageAnchor` / `App.trackPageAnchor`)
+  is bounded by a short hold after a restore, so a mid-reflow scroll event
+  cannot record a fraction that belongs to neither orientation.
+- New smoke checks: `DECODE_REPAIR` (a refused decode is remade and the fresh
+  URL draws), `THUMB_STALL` (a hung generation frees its lane and the next
+  request still works) and `TURN_PLACE` (a turn with no viewer leaves the
+  reader's tile on screen, with no route render and the same grid).
+- The web app changed (`core.js`, `app.js`, `views-vault.js`); the APK
+  (versionCode 93) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.16
+
+**Turning the phone no longer makes a moodboard flicker: the board keeps the
+pictures it is showing instead of reloading every tile for safety.**
+
+### A turn heals only what is broken
+
+Every orientation change used to hand **every** visible tile picture a
+brand-new URL, on the theory that a WebView will not draw an image URL twice
+after its surface is recreated. The result was that each rotation reloaded the
+whole board — the flicker. A live blob URL is re-decoded by the browser when
+it repaints, so the failure that actually needs healing is a URL the thumbnail
+cache has revoked (or a picture that came back empty), and that is exactly
+what the sweep's stale check detects. A healthy turn now leaves every picture
+on the URL it already had: nothing reloads, nothing flashes, and the same grid
+and tile nodes stay put. A tile whose copy was genuinely evicted is still
+remade, and a new smoke check turns the phone after an eviction to prove it.
+
+### The reveal under a viewer stays drawn, without reloading
+
+Closing a viewer after a turn runs the same heal under the opaque viewer — it
+re-sources only broken or revoked pictures. For the ones that only lost their
+decoded frame, the close now asks the browser to decode the visible pictures
+again (`img.decode()`) while the viewer still covers the board, so the reveal
+paints a drawn board without changing a single URL. The wait is capped, and if
+nothing needs decoding the close is immediate.
+
+### Smaller fixes
+
+- `BOARD_ROTATE` now requires **zero** re-sourced pictures on a healthy turn
+  (the flicker guard) and a new `BOARD_ROTATE_STALE` pass evicts one
+  thumbnail the way the LRU does, turns the phone, and requires that tile back
+  drawn on a live URL; `VIEWER_TURN` reports `resourcedTurn: 0`.
+- The web app changed (`core.js`, `app.js`); the APK (versionCode 92) and the
+  EXE are rebuilt.
+
+---
+
+## What is new in 3.6.15
+
+**Exiting a picture after turning the phone lands on the pin you were looking
+at, the board comes back drawn, and pausing a drill no longer moves the page.**
+
+### The close follows the pin, not the scroll offset
+
+Closing the viewer used to put the page back at the scroll offset saved when
+the viewer opened. That is only right in the orientation it was saved in: turn
+the phone under a picture and the board reflows (the column count changes), so
+the old offset lands on a different tile — "when you click exit after rotating
+you get sent to a different tile", with that other part of the board possibly
+not loaded yet. The viewer now remembers the tile element it was opened from
+and where that tile sat on screen, and the close restores *that*: the same pin
+at the same place in any orientation, or centred if the reader had swiped to a
+distant pin that was never on screen. A plain scroll offset is still the
+fallback for a viewer with no tiles behind it.
+
+### The board is healed once it is visible
+
+A phone can spend a thumbnail URL that was assigned while the board was
+covered by the viewer, which left tiles blank after a close. After the viewer
+is gone and the board has the screen, a plain sweep now remakes any tile
+picture that reports missing or revoked — while the reader can see it, so the
+repair cannot be wasted. A healthy board is not touched, so nothing flashes.
+
+### A route change resets the scroll instantly, and a drill repaint holds its place
+
+Navigating to another page reset the scroll with the stylesheet's smooth
+scrolling: the new page glided up while it played its entrance animation, and
+the glide could still be running behind the reader's next taps (the build
+drill check caught its tail). A route render replaces the whole page, so the
+reset is instant now. The build drill's own in-place repaint also suppresses
+scroll anchoring for its writes, because changing "Start the drill" into
+"Pause" could make the browser scroll the page up by itself as it re-anchored
+— "the build page scrolled during pause/resume".
+
+### The rest
+
+- A fresh thumbnail URL is no longer created over a newer entry: if a tile's
+  error path remade the copy while a sweep's read was in flight, both sides
+  converge on the live URL instead of one revoking the other under the tile.
+- The smoke suite gained `SIDEWAYS_EXIT`: open a viewer, turn the phone, exit
+  while still sideways, and the viewed tile must still be on screen, drawn and
+  on a live URL. The verify drill check settles any pending scroll first.
+- The web app changed (`core.js`, `app.js`, `views-build.js`,
+  `views-vault.js`); the APK (versionCode 91) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.14
+
+**An open picture can be turned as many times as you like: the moodboard comes
+back drawn, back where you left it, and nothing flashes.**
+
+### The turn is repaired under the viewer, then the board is revealed
+
+Turning the phone under an open picture recreates the WebView surface while the
+moodboard is covered, and Android will not draw the tile pictures again. 3.6.13
+remade them *during* the turn (behind the viewer) and then closed with a plain
+sweep, so the board could still come back blank after rotating left and right —
+and when the close did remake the pictures, it did so as the board was already
+being revealed, which read as a flash. The turn is only remembered now; the
+close remakes the visible tile pictures **while the viewer is still its own
+opaque layer**, and the fade starts only once the new frames are in (capped at
+under half a second). The reader sees the same picture for a moment longer and
+then the moodboard, drawn.
+
+### Coming back lands where you left
+
+A turn under the viewer reflows the board behind it — the column count changes,
+the document gets shorter — and because the page is locked while a viewer is
+open, the browser clamps the scroll to the shorter document. Rotating back left
+the reader near the bottom of the page. The scroll offset is saved when the
+viewer opens and put back (instantly, with no smooth-scroll animation) on every
+turn and again when the viewer closes, so the board is exactly where it was.
+
+### A plain close still touches nothing healthy
+
+With no turn, the close only heals a picture that is genuinely broken or whose
+URL was revoked. A picture whose load is still in flight is left to finish, and
+a tile that never asked for a copy is left to the viewport observer — the sweep
+does not turn a close, a resume or a turn into a burst of decodes.
+
+### Smaller fixes
+
+- The smoke suite's `VIEWER_TURN` now opens the viewer in portrait, turns both
+  ways, and requires the reader's scroll back and the fade never to start over
+  a black page; `BOARD_ROTATE` still requires a fresh live URL for every
+  visible picture on a turn with no viewer.
+- The web app changed (`core.js`, `app.js`); the APK (versionCode 90) and the
+  EXE are rebuilt.
+
+---
+
+## What is new in 3.6.13
+
+**A moodboard keeps its pictures when the phone is turned (and turned back),
+and exiting a picture or video no longer makes the board flash.**
+
+### A turn remakes the pictures in place, without a blink
+
+Android's WebView drops decoded images when its surface is recreated — a
+rotation is exactly that — and it will not draw the same image URL a second
+time. 3.6.12 stopped the page reload on a turn but only re-asked pictures it
+could prove were broken, so a board could come back blank after rotating and
+rotating back. The turn now hands every tile picture **on screen** a brand-new
+URL for the same stored copy. The new URL is read first and the URL under the
+tile is only revoked after the swap has been in place for a moment, so a
+picture that is still drawn never blinks: a healthy tile re-draws invisibly and
+a dropped one comes back. Turned under an open viewer, it happens behind the
+opaque viewer, so the board is already drawn when the viewer closes.
+
+### Exiting a viewer heals the board instead of flashing it
+
+Closing a picture used to re-ask every visible tile by revoking its URL first —
+on a WebView that drops revoked frames, every tile blinked. The close now uses
+the same non-destructive remake: healthy tiles swap invisibly, only genuinely
+broken or revoked ones are rebuilt from scratch. A turn under the viewer
+already remade the board behind it, so the close does not repeat the work.
+
+### The sweep no longer asks for a whole untouched board
+
+The shared sweep treated "no picture yet" as "broken", so closing a viewer,
+coming back from another app or turning the phone on a long board asked for
+every tile that had never been scrolled to — hundreds of decodes at once, and
+the board flashed as they all faded in. Off-screen tiles that never had a
+picture are left to the viewport observer, which owns exactly that job.
+
+### Smaller fixes
+
+- The smoke suite's `VIEWER_TURN` now requires every tile picture to be handed
+  a fresh URL by the turn, and `THUMB_VIEWPORT` requires the shared sweep to
+  leave a never-asked off-screen tile alone.
+- The web app changed (`core.js`, `app.js`); the APK (versionCode 89) and the
+  EXE are rebuilt.
+
+---
+
+## What is new in 3.6.12
+
+**Rotating the phone no longer reloads the page or flashes the moodboards, and
+closing a picture or video fades into the app instead of through black.**
+
+### Turning the phone keeps the page as it is
+
+Every orientation change used to run a route render. That replays the page
+entrance and rebuilds every moodboard on the page, so the tiles flashed back
+through their shimmer and the reader was thrown to the top: "when I rotate, the
+page reloads and my moodboards flash". The turn now only refits what actually
+has to move — the image viewer, the tab bar and the mini panel — and re-asks
+the tile pictures Android may have come back without decoded data for, through
+the same in-place sweep the viewer close already uses. The grid, the tiles, the
+scroll and every drawn picture stay exactly where they were, portrait to
+landscape and back.
+
+### Closing the viewer fades over the page, not over black
+
+The page is painted black while a viewer is open so a rotation cannot expose
+the light theme for a frame. On close, that black used to stay until the
+160ms timeout, when the fade-out had already finished — so the fade played
+over a black page and the moodboard popped back in at the end: "it glitches
+with some black stuff when I exit a picture". The black now goes as the close
+starts, so the fade is a real crossfade into the app. A close that loses its
+viewer to a newer one (a close followed by an immediate open) no longer clears
+the new viewer's state either.
+
+### Smaller fixes
+
+- The smoke suite's `VIEWER_TURN` now turns the phone on the board itself
+  before opening the viewer: it requires no route render, the same grid and
+  tile nodes and every picture still drawn after the turn, and the page not to
+  be black during the close fade.
+- The web app changed (`core.js`, `app.js`); the APK (versionCode 88) and the
+  EXE are rebuilt.
+
+---
+
+## What is new in 3.6.11
+
+**Coming back from a picture no longer reloads the moodboard and jumps it to
+the top of the page, and no longer flashes black while it does it.**
+
+### The board is repaired in place, not rendered again
+
+3.6.10 fixed the blank tiles after a rotation by rendering the page again when
+the viewer closed. That re-render emptied the page for a moment — the browser
+clamped the scroll, so the reader came back at the top of the page instead of
+on the tile they had opened — and the rebuild repainted the whole page
+mid-rotation, which is the black flash. The close path now repairs the tile
+pictures in place instead: the grid, the tiles, the scroll and the tile under
+the reader never move, and only the pictures on screen ask for a fresh copy
+(Android can keep a decoded picture it will not fetch again). The chrome (tab
+bar, mini panel) is refitted during the rotation itself, while the viewer
+still covers it, so the page behind cannot shift when the viewer closes either.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.js`, `views-vault.js`); `VIEWER_TURN` in
+  the smoke suite now requires the board to survive untouched, the page not to
+  jump and the tile the reader was on to stay on screen. The APK (versionCode
+  87) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.10
+
+**A moodboard that came back blank after opening a picture and turning the
+phone now loads its tiles again, and a tile picture whose thumbnail URL was
+revoked under it is remade before it can go blank.**
+
+### Opening a picture, turning the phone, coming back
+
+Turning the phone under the open viewer cannot rebuild the page behind it at
+the time — a route render during a full-screen video is exactly the churn the
+white-flash fixes removed — so the page under the viewer was left laid out for
+the old size, and the WebView could hand the tile pictures back blank. The turn
+is remembered now, and the close path renders the page again once the viewer is
+gone, for the size it is really at: every tile asks for its picture fresh.
+"Click a thumbnail, rotate, come back and the moodboard shows nothing" is gone.
+(3.6.11 replaced this with an in-place repair: rendering the page again moved
+the reader to the top of the page and repainted the board mid-rotation — see
+"What is new in 3.6.11".)
+
+### A stale tile URL is remade before it goes blank
+
+The thumbnail cache is a small LRU that revokes URLs as other tiles ask, and
+Android can drop decoded pictures while the viewer or another app has the
+screen. A tile holding a revoked URL keeps showing the decoded picture until
+the browser drops it — and from then on the dead URL can never draw again. The
+resume and viewer-close sweep now spots that the tile's URL is no longer the
+cache's live entry and remakes it, instead of waiting for the already-blank
+state.
+
+### An open "Pin from another board" picker survives a route render
+
+The picker's tiles ask for their pictures through the same viewport observer as
+the boards. A rotation re-renders the page under the open dialog, and the
+render used to drop every observed tile — including the picker's — so its
+pictures could never ask and came back blank. Only the page root's targets are
+dropped now; the picker's survive the render and load as usual.
+
+### The tile shimmer belongs to the tile, not the image
+
+The 3.6.9 viewport asking added the `loading` class to the `<img>` while the
+shimmer is a `.tile-v` rule (and the ask removed the class from the tile), so
+the shimmer never showed for a picture waiting on its copy. The class is now
+added to the tile itself when it is asked — from either the eager screenful or
+the observer.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.js`, `views-vault.js`); `THUMB_STALE`,
+  `PICKER_RENDER` and `VIEWER_TURN` were added to the smoke suite. The APK
+  (versionCode 86) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.9
+
+**Thumbnails on a 400–600 pin moodboard now load for the tiles you are
+looking at, in the order you reach them, instead of queueing the whole board
+behind them.**
+
+### A big board asks for the tiles on screen, not all of them at once
+
+Every tile used to ask for its small copy the moment the board painted, and
+the decodes queued in board order — so the reader's own screenful (wherever
+they had scrolled to) sat behind hundreds of jobs for tiles above and below
+them. That is why a 400–600 pin board felt like it never finished loading.
+Tiles now ask through a viewport observer: the board asks at once for the
+tiles on the first screen and for whatever is scrolled to, in the order the
+reader reaches them, and a fling confirms a tile after a beat so the tiles it
+passes do not pile up in front of the one the reader stops on. The shimmer
+only runs for tiles actually being asked for, not for hundreds of off-screen
+tiles.
+
+### Big imports are no longer warmed in the background
+
+Storing a file used to start making its thumbnail immediately. With 400–600
+files that meant minutes of the phone decoding stills nobody had looked at
+yet, competing with the tiles being looked at. A big import is no longer
+warmed — the board asks for what it shows — while a small import still warms
+its first tiles so the board is instantly there. The same viewport asking is
+used by the "Pin from another board" picker, so a board with hundreds of pins
+does not ask for all of them when the dialog opens.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.css`, `app.js`, `views-vault.js`);
+  `THUMB_VIEWPORT` was added to the smoke suite (an off-screen tile must not
+  be asked for, and scrolling to it must ask then). The APK (versionCode 85)
+  and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.8
+
+**Zooming a picture is no longer slowed down by the size of the moodboard
+behind it, and a tile picture that a decode failure or a revoked URL left
+blank is remade when the viewer closes or the app comes back.**
+
+### Zooming does not re-measure the page every wheel tick
+
+The zoom and pinch math read the viewer stage's box with
+`getBoundingClientRect()` on every gesture event. That forces the browser to
+lay the document out, so the cost grew with whatever was behind the viewer —
+a moodboard with three hundred tiles made zooming a picture feel heavy. The
+stage's box changes only when the window does, so it is measured once per
+paint and per rotation and reused; the zoom percentage is only written when
+the rounded value actually changes. The thumbnail queue also pauses while a
+viewer is open, so the phone's decoder is not busy making three hundred
+background stills while you pinch, and the viewer's backdrop is now opaque
+(it used to blend the whole board behind it on every frame).
+
+### A tile picture that came back broken is remade
+
+The thumbnail cache is a small LRU that revokes URLs as other tiles ask, and
+Android can drop decoded pictures while the app — or a full-screen viewer
+over it — has the screen. A tile that ends up holding a revoked URL now asks
+the store for a fresh copy instead of staying blank: its own error path does
+it once, and returning from the viewer or from another app sweeps every tile
+picture that came back broken. A copy that *could not be made* (a decode that
+ran out of memory under a big import, or while backgrounded) is also no
+longer written off for the rest of the session — the failure is retried after
+a while, and an explicit retry clears it immediately.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.css`, `app.js`, `views-vault.js`);
+  `VIEWER_ZOOM` gained a check that the stage box is not re-measured during a
+  gesture. The APK (versionCode 84) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.7
+
+**A large import no longer crawls to a stop, thumbnails arrive quickly on big
+boards and heal themselves after the app has been in the background, and
+turning the phone under an open picture no longer flashes white.**
+
+### Importing hundreds of files stays alive
+
+Storing a file is three pieces of work — hash it (a whole-file read), measure
+it (a decode) and write it — and every file used to do all three at once. A
+350-file import meant 350 whole files in the heap and hundreds of decodes in
+flight: "Storing 350 files…" slowed to a crawl and could hang the app. The
+store now runs a few files at a time (three lanes), so the heap stays bounded
+and the button keeps answering. The "Ready to pin" tray shows the files as
+they arrive — "Storing 12 of 350…" with a preview of the first screenful and
+a "+N more" count — instead of one long silent wait. The same photo picked
+several times in one batch is still stored once: the calls that share a
+content hash share one stored file and one result.
+
+### Thumbnails on a big board, and after a trip through another app
+
+Several things made a 350-pin board feel slow, and all of them are fixed:
+
+- **A tile's request now goes to the front of the line.** Warming copies in
+  the background and a tile waiting for its picture used to share one queue in
+  arrival order, so the first screen could sit behind hundreds of background
+  decodes. Tile requests are "hot" and background warming pauses while an
+  import is writing.
+- **One store read serves a whole screen of tiles.** Every tile used to open
+  its own read transaction; a repaint asked for 350. They are batched into
+  one transaction per 64 lookups.
+- **A tile whose URL went stale is remade from the store.** The thumbnail
+  cache is a small LRU (evicting and revoking URLs as other tiles ask), and
+  Android can drop decoded pictures while the app is in the background — that
+  was "the thumbnails are gone after I switch apps and come back". A tile
+  that comes back broken now asks the store for a fresh copy once instead of
+  showing the grey placeholder, and returning to the app sweeps any broken
+  tile pictures.
+- The bug behind some of this: the queue's completion callbacks captured the
+  loop's job variable, so with more than one lane a finished job could answer
+  for another job — one picture's URL delivered to another picture's waiter,
+  and a stored file answered to the wrong import call. Each job is captured
+  properly now.
+
+### No white flash when rotating a picture
+
+The page behind any open viewer is painted black, not just behind the
+full-screen video player. A rotation or a resize can expose the document for
+a frame, and on the light themes that near-white paper read as a flash over a
+picture as well as over a video. The viewer's own backdrop is 95% black, so
+the page colour is invisible until it is briefly exposed. (The full-bleed
+picture view — a zoomed picture passing behind the caption and the system
+bars in both orientations — is unchanged, and its check now forces the
+edge-to-edge shell class.)
+
+### Smaller fixes
+
+- The board's preview chips are capped at the first 24 with a "+N more" line:
+  hundreds of previews were a wall of decodes on their own.
+- The web app changed (`core.js`, `app.css`, `app.js`, `views-vault.js`);
+  `STORE_QUEUE`, `THUMB_HEAL` and the extended `VIEWER_BLEED` were added to
+  the smoke suite. The APK (versionCode 83) and the EXE are rebuilt.
+
+---
+
+## What is new in 3.6.6
+
+**Zoomed pictures use the whole screen, moodboard video pins show a real still
+in both orientations, and turning the phone under a full-screen video no
+longer flashes white.**
+
+### A zoomed picture passes behind the UI and the system bars
+
+The viewer's stage used to stop below its own caption bar and inside the
+navigation-bar insets, so a zoomed or panned picture was clipped into a
+smaller box. The picture is now full-bleed: the stage fills the whole window,
+the bar floats over it without taking layout space, and a zoomed picture may
+pass behind the caption and under the status and navigation bars (in portrait
+and in landscape, where the bar is a column down one edge). A tap on the
+bar's gradient still belongs to the picture, so dragging near the top edge
+works. Notes and audio keep the inset layout — a long note still fits and
+scrolls above the navigation bar, exactly as before.
+
+### Video pins get a real still frame
+
+A moodboard tile for a video shows its first good frame, and the decoder that
+makes that still was never in the document. Some Android WebViews never decode
+a frame for a detached `<video>`, so `loadeddata` never fired and every stored
+clip fell back to the grey placeholder — the "the moodboard does not load its
+pinned videos" report, in portrait and landscape alike. The decoder now lives
+in the page (parked at 2x2px, muted and unclickable, removed the moment the
+frame is drawn), the clip is played for a moment while frames are sampled, and
+the still is taken past the blank opening of a screen recording instead of
+frame zero — a white still was indistinguishable from "not loading". A copy
+saved by an older build is remade once for videos, so existing boards pick the
+fix up too.
+
+### No white flash when rotating a full-screen video
+
+The page behind the player is painted black for as long as video full screen
+lasts, its background aurora is dropped and the app's own bar strip is hidden.
+Turning the phone resizes the WebView and can expose the page for a frame; on
+the light themes that near-white paper background was the reported flash over
+the video. The shell already painted the window and the WebView black for the
+same frame; this is the page's half of it, and boot clears it in case a
+restored WebView kept it from a kill.
+
+### Smaller fixes
+
+- The stored-image total could settle on a stale count: a `total()` read that
+  began before an import, delete or wipe could cache its old list when it
+  resolved, leaving the vault and the moodboard size badges one change behind
+  (and could make a completed "Delete stored images" look like it failed).
+  Every read now carries a store generation and only caches while nothing has
+  changed under it.
+- The web app changed (`core.js`, `app.css`, `app.js`, `views-vault.js`); the
+  APK (versionCode 82) and the EXE are rebuilt with them.
+
+---
+
+## What is new in 3.6.5
+
+**The full-screen player now fills the screen properly, and the Android shell
+draws its own Exit control so a landscape video cannot cover it.**
+
+### The player fills the viewer, so the scrub bar is on screen
+
+The video was laid out inside a grid cell whose height came from its own
+content, so a percentage height never resolved: the player fell back to its
+intrinsic shape at full width and overflowed the window. A portrait clip held
+sideways became a 1457px-tall element in a 394px window — the picture was
+cropped and the native scrub bar sat about a thousand pixels below the bottom
+edge ("the scrub bar is not showing"). The player is pinned to the stage now:
+it always fills the viewer exactly, `object-fit` letterboxes instead of
+cropping, and the controls sit on the bottom edge in every orientation. The
+same fix stops a landscape clip from being cropped top and bottom.
+
+### The Exit control is native in the Android app
+
+On some WebViews a full-bleed `<video>` is a surface of its own and can cover
+anything the page paints over it — with a landscape clip filling the window,
+the page's floating **Exit full screen** button could be invisible. The Android
+shell now draws its own Exit control above the WebView while video full screen
+lasts (a pill in the same spot, inside the status-bar and cutout insets), and
+the page hides its floating bar for as long as the shell answers so there is
+never a duplicate. Browsers and the desktop app keep the page's own bar.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.css`, `views-vault.js`) and the Android
+  shell changed (`MainActivity.java`); the APK (versionCode 81) and the EXE are
+  rebuilt with them.
+
+---
+
+## What is new in 3.6.4
+
+**The full-screen video controls float over the video, and the picture keeps
+its place while you zoom.**
+
+### The full-screen controls are on top of the video, not above it
+
+The player's bar used to sit in the layout above the video, so a black strip
+pushed the picture down and covered the top of the frame. The bar now floats
+over the player: the video fills the whole window and the **Exit full screen**
+control (and the ✕) are drawn on top of it, inset from the display cutout and
+kept clear of the status-bar zone. Turning the phone re-asserts the hidden
+bars and the Exit control stays visible in both orientations — holding it
+sideways no longer leaves the control off screen or under the system bars.
+
+### A video full screen offers no Edit control
+
+The pin editor's **Edit** button is for reading and fixing a pin's words; it
+has no business over a playing video. While a video is full screen the player's
+bar carries only **Exit full screen** and ✕. Captions are still editable from
+the tile's ✎ on the board.
+
+### Zooming a picture no longer jumps or drifts
+
+Two separate bugs in the viewer's zoom:
+
+- **The commit snap.** A zoomable picture was centred by the browser's grid
+  alignment, and a centred element bigger than its container is not actually
+  centred — the browser falls back to aligning its start edge. So the moment a
+  wheel or pinch gesture committed the new size (a moment after you stopped
+  moving), the picture jumped by half the overflow. The picture is now anchored
+  to a zero-size point at the stage's centre, which cannot overflow, so the
+  point under the cursor stays put at every size.
+- **The pinch drift.** A pinch pivoted on the *new* midpoint and then also
+  translated by the midpoint movement, so the material under the fingers slid
+  away by that movement on every event where the two fingers were delivered
+  one at a time (which is how touch arrives). It now pivots on the midpoint
+  the gesture had, then follows the movement — the picture stays under the
+  fingers.
+
+### Smaller fixes
+
+- The web app changed (`core.js`, `app.css`, `views-vault.js`); the APK
+  (versionCode 80) and the EXE are rebuilt with them.
+
+---
+
+## What is new in 3.6.3
+
+**A video is a player: tapping one opens it full screen, and the Exit control
+takes you back to the page.**
+
+### Video opens full screen; Exit returns to the page
+
+Tapping a video pin (or swiping onto a video while browsing a board) now takes
+it full screen by itself — there is no half-full-screen video state to get
+stuck in. The **Exit full screen** control leaves the video and closes the
+viewer, putting you back on the moodboard page you opened it from. Android's
+back does the same, and the stray back gesture that can follow the exit tap is
+ignored so it cannot walk the page behind you backwards.
+
+### The Exit control can no longer be hidden by the video
+
+The exit button used to float over the full-bleed player in the corner. On
+Android the video's own surface and the system bars are drawn over that corner
+— held sideways, the button could be invisible. The player's bar now stays in
+the layout above the video, so the **Exit full screen** control (and the ✕) are
+always on screen in both orientations. The video fills the rest.
+
+### Smaller fixes
+
+- The web app changed (`app.js`, `core.js`, `app.css`, `views-vault.js`); the
+  APK (versionCode 79) and the EXE are rebuilt with them.
+
+---
+
+## What is new in 3.6.2
+
+**Watching a video sideways on Android no longer flashes, and the full-screen
+controls behave.**
+
+### No more white flash when the phone turns
+
+Rotation exposes the window and WebView surfaces for a frame, and the shell's
+background was the light launch colour — so turning the phone over a full-screen
+video flashed white. The page now hands its own background colour to the
+Android shell on every theme change and when the near-black viewer opens, and
+the shell paints the window and the WebView behind the page with it. While
+video full screen is up they are painted black to match the player's backdrop,
+so the frames a rotation exposes are invisible instead of white.
+
+### Full screen survives the turn
+
+Full screen used to lose the shell's edge-to-edge state when it hid the system
+bars: the safe-area probe read zero, the `e2e` class was dropped, and showing
+the bars again never restored it (an edge-to-edge WebView is not resized by the
+bars). Held sideways, the navigation bar column could then sit over the
+viewer's own controls. The shell is now measured as edge-to-edge once and stays
+that way for the session, and leaving full screen re-measures it when the bars
+come back. Turning the phone under the open viewer also no longer rebuilds the
+page behind it.
+
+### Exit full screen no longer closes the video
+
+In landscape the only exit control sits in the corner Android keeps for the
+back gesture, and the gesture that grew out of the closing tap could arrive as
+a back a moment after the click had already left full screen — taking the whole
+video with it. The control now sits clear of the gesture strip, and a back that
+follows a full-screen exit within a moment is ignored: the reader asked to
+leave full screen, not to close the video. Android's own back still leaves full
+screen first, then closes the viewer on the next press.
+
+### Smaller fixes
+
+- The web app changed (`app.js`, `core.js`, `app.css`, `views-vault.js`) and
+  the Android shell changed (`MainActivity.java`, `SystemBarsPlugin.java`); the
+  APK (versionCode 78) and the EXE are rebuilt with them.
+
+---
+
+## What is new in 3.6.1
+
+**The top-bar buttons work on a touch screen, a restore leaves you where you
+were, and changing the theme is instant.**
+
+### The tap that opens a thing no longer closes it
+
+On a touch screen, Chromium follows every tap with a small burst of
+compatibility mouse events (`mousedown`, `mouseup`, `click`) aimed at whatever
+is under the finger — and the top-bar buttons act on `pointerup`. So by the
+time the burst arrived, the drawer or the dialog the tap had just opened was
+under the finger, and the burst closed it: the hamburger opened and instantly
+shut the drawer, and **Switch tool** and **Save a backup** flashed open and
+closed on the tap that opened them. The compatibility burst is now swallowed
+before any overlay can see it, and a freshly opened dialog and the drawer's
+dim layer ignore a dismissal in their first moments as a backstop. The buttons
+are unchanged otherwise: they still answer the tap that stops a fling.
+
+### Restoring a backup keeps you on the Vault
+
+The restore dialog's **Done** used to send you to Home and rebuild the page
+under you. It now repaints the Vault tab in place — same for the data-only
+(`.json`) restore, whose dialog also closes itself when it has restored — so
+after an import you are exactly where you were, the page does not reload, and
+scrolling carries on where it left off. The busy lock that freezes the page
+during the restore is released on every way out of the dialog, so a page that
+will not scroll can no longer be left behind.
+
+### Theme switching is fast
+
+Changing the theme recolours every element at once, and the full-screen
+blurred aurora is the most expensive surface to rebuild — on a phone that read
+as "slow and laggy" on every theme tap. For the swap the blurred surfaces run
+plain and get their blur back once the new palette is already painted; the
+bar icons also no longer force a synchronous style recalculation of the whole
+document while the theme is changing (the theme's own colours are known
+without measuring them). The switch reads as instant now.
+
+### Vault is on Studio's Home
+
+Studio's Home has a **Vault** card in its **Jump in** grid, next to *Open the
+toolbox* and *Build and tune*: backups, notes, templates, the glossary and
+settings are one tap away from the page you land on.
+
+### Smaller fixes
+
+- On older Android (before 15), the bars the system still paints itself now
+  match the near-black image viewer while it is open, instead of the light
+  theme surface behind it.
+- The web app changed (`app.js`, `core.js`, `app.css`, `views-home.js`,
+  `views-vault.js`); the APK (versionCode 77) and the EXE are rebuilt with it.
+
+---
+
+## What is new in 3.6.0
+
+**Big moodboards stay smooth, the drawer answers the first tap, the zip
+dialogs tell the truth, and video fits the screen you actually have.**
+
+### Large moodboards are fast now
+
+A 600MB–1GB gallery means photos in the 10–20 megapixel range, and the old
+thumbnail path decoded every one of them at full size — a 48MB bitmap each —
+sometimes more than once, because a repaint while a thumbnail was still being
+made queued the same decode again. On a phone that was tens of seconds of
+churn, and it is what made a big board crawl and its thumbnails slow to
+appear. Now:
+
+- **One job per file.** A repaint while a thumbnail is in flight waits on the
+  job already running instead of starting a second decode of the same photo.
+- **Decoded at thumbnail size.** When the file's dimensions are known (they
+  always are, measured at import) the decode is asked for the 800px copy
+  directly, so the full-size bitmap never exists.
+- **Made ahead of time.** A file's thumbnail is generated in the background as
+  soon as it is stored, so opening the board later finds the tiles ready
+  instead of watching a queue.
+- **The queue yields.** Thumbnails are made two at a time and the page gets
+  the main thread between them, so scrolling, clicking and the viewer never
+  sit behind a long batch.
+- **The store total is cached.** Every board badge and every page render used
+  to re-read the image store to sum it; it is counted once and kept in step.
+
+Zooming a huge photo in the viewer is now a compositor transform while the
+gesture is moving — the layout size is rewritten only when the gesture pauses,
+so a wheel or a pinch no longer re-rasterises a 12MP image every frame. The
+picture is drawn at full resolution the moment the gesture stops.
+
+### The drawer answers the first tap
+
+While the page is coasting after a flick, the tap that stops the scroll is
+used up doing that and never becomes a click — so the hamburger read as dead
+the moment you tried it while scrolling. The top bar's buttons now act on
+`pointerup`, with the click that follows a real tap ignored so nothing runs
+twice. The drawer's page lock is the dim layer itself (no touch, no wheel)
+instead of `overflow: hidden` on the document: making the root unscrollable
+un-stuck every sticky element, and the top bar jumped out of view and back on
+every open.
+
+### Exports and imports tell the truth
+
+- The progress bar used to animate itself to full in one second whatever was
+  happening, so a long pack looked finished (and an import that failed
+  instantly showed a full green bar). Meters now start empty and follow real
+  progress only.
+- Packing and writing are shown as two phases with their own progress, and the
+  dialog says "Saved" only when the bytes have reached the file.
+- The dialogs have no ✕ while the job runs, and the page behind them is
+  locked (no wheel, no touch, no scroll keys) for exactly as long as it takes.
+  The import dialogs stay closable until a file is chosen.
+- A zip picked before its export has finished now says it is incomplete
+  instead of "not a zip", and an empty file says so. That is the file the old
+  dialogs let you pick up mid-write — which is why some exports failed to
+  import at all.
+
+### Video fits the screen you actually have
+
+Viewer media was sized in `vw`, so on a phone held sideways the player was
+wider than the stage the safe-area insets leave and its right end — and the
+control strip sitting there — was clipped. The video, audio and colour panels
+are now sized against the stage itself and can never overflow it; the video
+keeps its aspect ratio, and its own controls stay inside the reserved space.
+
+### Smaller fixes
+
+- **"Save files to device"** could fail for every file but the last few: the
+  full-size URL cache is a small LRU and resolving the next file revoked the
+  URL the browser was still downloading. Each file is held until its download
+  has been taken.
+- A failed chunked save now tells the native writer to drop the half-written
+  file, so the next save cannot be refused with "still in progress".
+- The image-store total is recomputed rather than trusted if a wipe raced an
+  import that was still storing.
+
+- The web app changed (`app.js`, `core.js`, `app.css`, `views-design.js`,
+  `views-vault.js`, `desktop-src/smoke.js`); the APK (versionCode 76) and the
+  EXE are rebuilt with it.
 
 ---
 
