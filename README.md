@@ -8,7 +8,7 @@ for planning, designing, market research and launch; **Music**, **3DFoundry**,
 **2DCanvas** and **Story** for the skills that make the work actually good —
 plus **Pocket** versions of each for finishing something in a single day.
 
-No accounts, no ads, no telemetry. Available on Windows and Android. Download the up to date app and source files on the releases page.
+No accounts, no ads, no telemetry. Available on Windows,Linux MacOS (ARM and x86) and Android. Download the up to date app and source files on the releases page.
 
 ---
 
